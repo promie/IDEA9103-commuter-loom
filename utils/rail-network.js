@@ -4,7 +4,7 @@
 // window. Where several lines share a stretch of track it places them side
 // by side as a parallel bundle, the way the official network map does.
 // It also draws the map furniture (track guides, station names, line
-// badges).
+// badges) and answers "which line is the mouse near?".
 //
 // AI acknowledgement: this class was written with the help of Claude
 // (Anthropic). The corner rounding uses Chaikin's corner-cutting algorithm
@@ -15,6 +15,9 @@ const LANE_GAP_UNITS = 0.72;
 
 // How far before a station a bend or lane change starts, in grid units.
 const CORNER_INSET_UNITS = 0.7;
+
+// How close (in pixels) the mouse must be to a line to touch it.
+const LINE_HIT_DISTANCE = 18;
 
 class RailNetwork {
   constructor(stations, lineRoutes, laneOrder, theme) {
@@ -35,6 +38,9 @@ class RailNetwork {
 
     // paths["T1"] is the list of TrackPath objects (one per branch) for T1.
     this.paths = {};
+
+    // Points spaced along every line, used to find the line nearest the mouse.
+    this.hitPoints = [];
 
     // Where each line's name badge is drawn.
     this.badges = [];
@@ -83,6 +89,7 @@ class RailNetwork {
     this.collectLanes();
 
     this.paths = {};
+    this.hitPoints = [];
     for (let route of this.lineRoutes) {
       // Lines with two branches give each branch a share of the particles,
       // so the shared trunk carries the most.
@@ -92,6 +99,7 @@ class RailNetwork {
         let stopIds = route.branches[branchIndex];
         let path = this.buildTrackPath(route.lineName, branchIndex, stopIds, particleShare);
         branchPaths.push(path);
+        this.addHitPoints(path);
       }
       this.paths[route.lineName] = branchPaths;
     }
@@ -261,6 +269,31 @@ class RailNetwork {
       }
     }
     return busyStations;
+  }
+
+  // Remembers a point every 10 pixels along the path, for mouse hit tests.
+  addHitPoints(path) {
+    let position = {};
+    let segmentIndex = 0;
+    for (let distance = 0; distance <= path.totalLength; distance += 10) {
+      segmentIndex = path.findSegmentIndex(distance, segmentIndex);
+      path.getPositionAt(distance, segmentIndex, position);
+      this.hitPoints.push({ x: position.x, y: position.y, path: path, distance: distance });
+    }
+  }
+
+  // The hit point closest to (x, y), or null if no line is close enough.
+  findNearestHitPoint(x, y) {
+    let nearest = null;
+    let nearestDistance = LINE_HIT_DISTANCE;
+    for (let hitPoint of this.hitPoints) {
+      let distanceToMouse = dist(x, y, hitPoint.x, hitPoint.y);
+      if (distanceToMouse < nearestDistance) {
+        nearestDistance = distanceToMouse;
+        nearest = hitPoint;
+      }
+    }
+    return nearest;
   }
 
   // Is (x, y) in the part of the screen clear of the header and timeline?
