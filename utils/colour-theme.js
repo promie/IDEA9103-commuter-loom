@@ -5,7 +5,8 @@
 // its colours instead of typing them in, so switching theme recolours the
 // whole artwork at once.
 //
-// Adding ?theme=light to the page address starts in the light theme.
+// Switch with the sun/moon toggle switch or the D key. Adding
+// ?theme=light to the page address starts in the light theme.
 //
 // AI acknowledgement: this class was written with the help of Claude
 // (Anthropic).
@@ -69,10 +70,31 @@ const DARK_PALETTE = {
   lineColours: NIGHT_LINE_COLOURS,
 };
 
+// The toggle switch: a sun on the left, a moon on the right, and a knob
+// that style.css slides onto the theme in use. The icons are SVG drawings.
+const SUN_ICON =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/>' +
+  '<path d="M12 1.5v2.5M12 20v2.5M1.5 12H4M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8" ' +
+  'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+const MOON_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z" fill="currentColor"/></svg>';
+const THEME_SWITCH_HTML =
+  '<span class="switch-knob"></span>' +
+  '<span class="switch-icon switch-sun">' + SUN_ICON + '</span>' +
+  '<span class="switch-icon switch-moon">' + MOON_ICON + '</span>';
+
 class ColourTheme {
   constructor(themeName) {
     this.name = "dark";
     this.palette = DARK_PALETTE;
+
+    // The switch is placed from sketch.js.
+    // role="switch" tells screen readers it is an on/off switch, and
+    // aria-checked (set in use()) says whether dark mode is on.
+    this.button = createButton(THEME_SWITCH_HTML);
+    this.button.id("theme-control");
+    this.button.addClass("commuter-control");
+    this.button.attribute("role", "switch");
+    this.button.attribute("aria-label", "Dark mode");
 
     this.use(themeName);
   }
@@ -85,6 +107,27 @@ class ColourTheme {
     } else {
       this.name = "dark";
       this.palette = DARK_PALETTE;
+    }
+
+    // The buttons are HTML, styled by style.css (dark by default). Adding
+    // the class "light" to the page switches them to light-theme colours.
+    let page = select("body");
+    if (this.name === "light") {
+      page.addClass("light");
+      this.button.attribute("aria-checked", "false");
+      this.button.attribute("title", "Switch to dark mode");
+    } else {
+      page.removeClass("light");
+      this.button.attribute("aria-checked", "true");
+      this.button.attribute("title", "Switch to light mode");
+    }
+  }
+
+  toggle() {
+    if (this.name === "dark") {
+      this.use("light");
+    } else {
+      this.use("dark");
     }
   }
 

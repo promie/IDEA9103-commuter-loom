@@ -40,6 +40,9 @@ function setup() {
   fitMap();
 
   inputControls = new InputControls(railNetwork);
+
+  theme.button.mousePressed(toggleTheme);
+  positionControls();
 }
 
 function draw() {
@@ -52,10 +55,25 @@ function draw() {
   railNetwork.drawLineBadges(inputControls.selectedLineName);
 }
 
-// Builds the map's tracks to fill the window.
+// Space along the bottom of the window for the controls.
+const CONTROLS_HEIGHT = 76;
+
+// Builds the map's tracks to fill the window, above the controls.
 function fitMap() {
-  railNetwork.mapBottom = height - 40;
+  railNetwork.mapBottom = height - CONTROLS_HEIGHT;
   railNetwork.build();
+}
+
+// Temporary: puts the theme switch at the bottom left, under the map.
+// The interface overlay will lay out all the controls later.
+function positionControls() {
+  theme.button.position(28, height - CONTROLS_HEIGHT + 16);
+}
+
+// Button callback. p5's mousePressed() on a button needs a plain
+// function, so this passes the click on to the theme.
+function toggleTheme() {
+  theme.toggle();
 }
 
 // Temporary: each track drawn as a solid line in its line's colour,
@@ -105,11 +123,17 @@ function mouseReleased() {
 }
 
 function keyPressed() {
+  // D switches between the light and dark themes.
+  if (key === "d" || key === "D") {
+    theme.toggle();
+  }
   inputControls.handleKeyPressed();
 }
 
-// Keep the artwork filling the window: rebuild the tracks for the new size.
+// Keep the artwork filling the window: rebuild the tracks for the new size
+// and move the controls to the new bottom edge.
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
   fitMap();
+  positionControls();
 }

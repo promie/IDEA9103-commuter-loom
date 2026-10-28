@@ -1,3 +1,11 @@
+/* The page starts in the dark theme (the default). ColourTheme adds the
+   class "light" to the page when the light theme is chosen; the rules at
+   the bottom of this file then switch the colours. */
+:root {
+  color-scheme: dark;
+  background: #0e111a;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -12,4 +20,129 @@ body {
 /* Stop the canvas leaving a small gap underneath it. */
 canvas {
   display: block;
+}
+
+/* ---------- The controls ---------- */
+
+.commuter-control {
+  position: fixed;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  /* Stop the browser's grey flash when the control is tapped. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The icons are SVG drawings that use the button's text colour
+   (currentColor), so they change colour with the theme. */
+.commuter-control svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+/* The theme switch: a track with a sun and a moon, and a knob that slides
+   to the theme in use. */
+#theme-control {
+  width: 76px;
+  height: 44px;
+  justify-content: space-between;
+  padding: 0 11px;
+}
+
+#theme-control .switch-icon {
+  position: relative;
+  z-index: 1;
+  display: flex;
+}
+
+#theme-control .switch-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+#theme-control .switch-knob {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  /* Dark theme (default): the knob sits on the moon, on the right. */
+  transform: translateX(32px);
+  transition: transform 0.25s ease;
+}
+
+/* ---------- Dark theme (default) ---------- */
+
+#theme-control {
+  border: 1px solid rgba(242, 239, 230, 0.6);
+  background: rgba(14, 17, 26, 0.6);
+  color: #f2efe6;
+}
+
+#theme-control .switch-knob {
+  background: #f2efe6;
+}
+
+/* The icon under the knob takes the background colour so it stays visible. */
+#theme-control .switch-moon {
+  color: #0e111a;
+}
+
+/* Keyboard focus ring. */
+.commuter-control:focus-visible {
+  outline: 2px solid #f2efe6;
+  outline-offset: 3px;
+}
+
+/* Hover effects only on devices with a real mouse. On phones a tapped
+   button would otherwise stay in its hover colour until you tap elsewhere. */
+@media (hover: hover) {
+  #theme-control:hover {
+    border-color: #f2efe6;
+    background: rgba(242, 239, 230, 0.12);
+  }
+}
+
+/* ---------- Light theme ---------- */
+
+body.light {
+  color-scheme: light;
+  background: #f8f5ec;
+}
+
+body.light #theme-control {
+  border-color: rgba(23, 26, 34, 0.6);
+  background: rgba(248, 245, 236, 0.6);
+  color: #171a22;
+}
+
+/* Light theme: the knob slides left onto the sun. */
+body.light #theme-control .switch-knob {
+  background: #171a22;
+  transform: translateX(0);
+}
+
+body.light #theme-control .switch-sun {
+  color: #f8f5ec;
+}
+
+body.light #theme-control .switch-moon {
+  color: #171a22;
+}
+
+body.light .commuter-control:focus-visible {
+  outline-color: #171a22;
+}
+
+@media (hover: hover) {
+  body.light #theme-control:hover {
+    border-color: #171a22;
+    background: rgba(23, 26, 34, 0.08);
+  }
 }

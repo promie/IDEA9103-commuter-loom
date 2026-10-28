@@ -3,7 +3,8 @@
 // The mouse is a hand touching the rail network like fabric:
 //   - click a line:   listening mode, where that line comes forward and
 //                     the rest of the network fades back
-// Keyboard: R resets (leaves listening mode).
+// Keyboard: R resets (leaves listening mode), D switches between the light
+// and dark themes.
 //
 // p5's event functions (mousePressed() etc.) live in sketch.js and call
 // the matching handle...() method here.
@@ -24,6 +25,10 @@ class InputControls {
     // When the mouse was pressed, and the line under it (if any).
     this.pressMillis = 0;
     this.pressedLineName = null;
+
+    // Whether the last press was on the map. Presses on the controls
+    // below it (like the theme switch) belong to the controls.
+    this.pressedOnMap = false;
   }
 
   handleMouseMoved() {
@@ -42,7 +47,8 @@ class InputControls {
   handleMousePressed() {
     this.pressedLineName = null;
     // Below the map is not part of the fabric.
-    if (mouseY > this.railNetwork.mapBottom) {
+    this.pressedOnMap = mouseY <= this.railNetwork.mapBottom;
+    if (!this.pressedOnMap) {
       return;
     }
 
@@ -54,6 +60,10 @@ class InputControls {
   }
 
   handleMouseReleased() {
+    if (!this.pressedOnMap) {
+      return;
+    }
+
     let wasClick = millis() - this.pressMillis < CLICK_MAX_MILLIS;
     if (this.pressedLineName !== null && wasClick) {
       this.toggleListening(this.pressedLineName);
