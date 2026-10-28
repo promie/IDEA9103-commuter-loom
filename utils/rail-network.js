@@ -3,7 +3,8 @@
 // screen-space tracks (TrackPath objects) for every line, fitted to the
 // window. Where several lines share a stretch of track it places them side
 // by side as a parallel bundle, the way the official network map does.
-// It also draws faint track guides under the particles.
+// It also draws the map furniture (track guides, station names, line
+// badges).
 //
 // AI acknowledgement: this class was written with the help of Claude
 // (Anthropic). The corner rounding uses Chaikin's corner-cutting algorithm
@@ -35,10 +36,25 @@ class RailNetwork {
     // paths["T1"] is the list of TrackPath objects (one per branch) for T1.
     this.paths = {};
 
-    // The area the map is fitted into, from the top of the screen to the
-    // bottom (set from sketch.js).
+    // Where each line's name badge is drawn.
+    this.badges = [];
+
+    // A rectangle labels must stay out of (the DataPanel), or null.
+    this.reservedArea = null;
+
+    // The area the map is fitted into: from a little below the top of the
+    // screen (leaving room for the title and the data panel) down to the
+    // top of the control dock, so no track or station sits under the controls.
     this.mapTop = 40;
     this.mapBottom = 600;
+  }
+
+  isInReservedArea(x, y) {
+    let area = this.reservedArea;
+    if (area === null) {
+      return false;
+    }
+    return x > area.left && x < area.right && y > area.top && y < area.bottom;
   }
 
   // Rebuilds every track for the current window size. Called from setup()
@@ -79,6 +95,8 @@ class RailNetwork {
       }
       this.paths[route.lineName] = branchPaths;
     }
+
+    this.findBadgePositions();
   }
 
   getStation(stationId) {
@@ -245,11 +263,229 @@ class RailNetwork {
     return busyStations;
   }
 
+  // Is (x, y) in the part of the screen clear of the header and timeline?
+  isInLabelArea(x, y) {
+    let onScreen = x > 26 && x < width - 26 && y > 150 && y < this.mapBottom - 24;
+    return onScreen && !this.isInReservedArea(x, y);
+  }
+
+  // A station is a "through" stop if some line passes through it rather
+  // than starting or ending there.
+  isThroughStop(stationId) {
+    for (let route of this.lineRoutes) {
+      for (let stopIds of route.branches) {
+        for (let i = 1; i < stopIds.length - 1; i++) {
+          if (stopIds[i] === stationId) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  // One badge per line end: where the line leaves the screen, or at its
+  // terminus if that is on screen.
+  findBadgePositions() {
+    this.badges = [];
+    let position = {};
+    for (let route of this.lineRoutes) {
+      let branchPaths = this.paths[route.lineName];
+      for (let branchIndex = 0; branchIndex < route.branches.length; branchIndex++) {
+        let stopIds = route.branches[branchIndex];
+        let path = branchPaths[branchIndex];
+
+        // Check both ends of the branch. City Circle routes start in the
+        // CBD, so only their far end gets a badge.
+        let ends = [
+          { stationId: stopIds[0], startDistance: 0, step: 4 },
+          { stationId: stopIds[stopIds.length - 1], startDistance: path.totalLength, step: -4 },
+        ];
+        if (path.loopLength > 0) {
+          ends.splice(0, 1);
+        }
+
+        for (let end of ends) {
+          // Skip lines that end on screen on another line's trunk (T6 and
+          // T7 at Lidcombe, T9 at Gordon); a badge would cover the bundle.
+          let endStation = this.getStation(end.stationId);
+          let endIsVisible = this.isInLabelArea(this.toScreenX(endStation), this.toScreenY(endStation));
+          if (endIsVisible && this.isThroughStop(end.stationId)) {
+            continue;
+          }
+
+          // Walk in from the end of the track until we reach the visible area.
+          let segmentIndex = path.findSegmentIndex(end.startDistance, 0);
+          for (let distance = end.startDistance; distance >= 0 && distance <= path.totalLength; distance += end.step) {
+            segmentIndex = path.findSegmentIndex(distance, segmentIndex);
+            path.getPositionAt(distance, segmentIndex, position);
+            if (this.isInLabelArea(position.x, position.y)) {
+              this.addBadge(route.lineName, position.x, position.y);
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Adds a badge unless this line already has one here. If it would cover
+  // another line's badge, it is nudged upwards until it doesn't.
+  addBadge(lineName, x, y) {
+    for (let badge of this.badges) {
+      if (badge.lineName === lineName && dist(badge.anchorX, badge.anchorY, x, y) < 30) {
+        return;
+      }
+    }
+
+    // Try the line's own spot first, then the nearest spots above and
+    // below it in turn (22 pixels up, 22 down, 44 up, 44 down...), so a
+    // badge that has to move stays as close to its line as possible.
+    // Only spots inside the map area count, so a badge never ends up in the
+    // header or the control dock. If no spot is free, it stays on its line.
+    let badgeY = y;
+    for (let attempt = 0; attempt < 9; attempt++) {
+      let tryY = y;
+      let distance = ceil(attempt / 2) * 22;
+      if (attempt % 2 === 1) {
+        tryY = y - distance;
+      } else if (attempt > 0) {
+        tryY = y + distance;
+      }
+      if (this.isInLabelArea(x, tryY) && !this.badgeWouldOverlap(x, tryY)) {
+        badgeY = tryY;
+        break;
+      }
+    }
+    this.badges.push({ lineName: lineName, x: x, y: badgeY, anchorX: x, anchorY: y });
+  }
+
+  // Would a badge centred at (x, y) cover another badge or a station name?
+  // Badges are 26 x 18; names sit just right of and above their station.
+  badgeWouldOverlap(x, y) {
+    for (let badge of this.badges) {
+      if (abs(badge.x - x) < 30 && abs(badge.y - y) < 20) {
+        return true;
+      }
+    }
+
+    push();
+    textSize(11);
+    for (let station of this.stations) {
+      if (station.tier < 2) {
+        continue;
+      }
+      let labelLeft = this.toScreenX(station) - 6;
+      let labelTop = this.toScreenY(station) - 18;
+      let labelRight = this.toScreenX(station) + 13 + textWidth(station.name);
+      let labelBottom = this.toScreenY(station) + 6;
+      let overlapsSideways = x + 13 > labelLeft && x - 13 < labelRight;
+      let overlapsUpDown = y + 9 > labelTop && y - 9 < labelBottom;
+      if (overlapsSideways && overlapsUpDown) {
+        pop();
+        return true;
+      }
+    }
+    pop();
+    return false;
+  }
+
   drawTrackGuides() {
     for (let route of this.lineRoutes) {
       for (let path of this.paths[route.lineName]) {
         path.drawGuide(this.theme.palette.trackGuide);
       }
     }
+  }
+
+  // Names of the big stations, on a small paper-coloured background so
+  // they stay readable over the moving particles. The CBD hubs (tier 3)
+  // are labelled first, then the interchanges (tier 2). A name is skipped
+  // if it would overlap one already drawn, which matters on small screens
+  // where the CBD stations sit very close together.
+  drawStationLabels() {
+    push();
+    textSize(11);
+    textAlign(LEFT, CENTER);
+    let drawnLabels = [];
+    for (let tier = 3; tier >= 2; tier--) {
+      for (let station of this.stations) {
+        if (station.tier === tier) {
+          this.drawStationLabel(station, drawnLabels);
+        }
+      }
+    }
+    pop();
+  }
+
+  // Draws one station's dot and name, unless the name would overlap a
+  // label in drawnLabels. Each drawn label is added to that list.
+  drawStationLabel(station, drawnLabels) {
+    let x = this.toScreenX(station);
+    let y = this.toScreenY(station);
+    if (x < 0 || x > width || y < 90 || y > this.mapBottom - 24 || this.isInReservedArea(x, y)) {
+      return;
+    }
+
+    // The label's box: just right of the dot and slightly above it.
+    if (station.tier === 3) {
+      textStyle(BOLD);
+    } else {
+      textStyle(NORMAL);
+    }
+    let labelLeft = x + 7;
+    let labelTop = y - 16;
+    let labelWidth = textWidth(station.name) + 4;
+    let labelHeight = 14;
+    for (let other of drawnLabels) {
+      let overlapsSideways = labelLeft < other.left + other.width && other.left < labelLeft + labelWidth;
+      let overlapsUpDown = labelTop < other.top + other.height && other.top < labelTop + labelHeight;
+      if (overlapsSideways && overlapsUpDown) {
+        return;
+      }
+    }
+    drawnLabels.push({ left: labelLeft, top: labelTop, width: labelWidth, height: labelHeight });
+
+    // Station dot: bigger for the CBD hubs.
+    fill(this.theme.palette.stationDot);
+    stroke(this.theme.palette.stationOutline);
+    strokeWeight(1.5);
+    if (station.tier === 3) {
+      circle(x, y, 10);
+    } else {
+      circle(x, y, 7);
+    }
+
+    // The name on its paper-coloured background.
+    noStroke();
+    let labelBackground = this.theme.palette.labelBackground;
+    fill(labelBackground[0], labelBackground[1], labelBackground[2], labelBackground[3]);
+    rect(labelLeft, labelTop, labelWidth, labelHeight, 3);
+    fill(this.theme.palette.labelText);
+    text(station.name, x + 9, y - 9);
+  }
+
+  // A small coloured "T1" style badge at each line end. In listening mode,
+  // every badge except the selected line's fades back.
+  drawLineBadges(selectedLineName) {
+    push();
+    rectMode(CENTER);
+    textAlign(CENTER, CENTER);
+    textStyle(BOLD);
+    textSize(11);
+    noStroke();
+    for (let badge of this.badges) {
+      let badgeColour = color(this.theme.getLineColour(badge.lineName));
+      let textColour = color(this.theme.palette.badgeText);
+      if (selectedLineName !== null && selectedLineName !== badge.lineName) {
+        badgeColour.setAlpha(75);
+        textColour.setAlpha(75);
+      }
+      fill(badgeColour);
+      rect(badge.x, badge.y, 26, 18, 4);
+      fill(textColour);
+      text(badge.lineName, badge.x, badge.y + 1);
+    }
+    pop();
   }
 }

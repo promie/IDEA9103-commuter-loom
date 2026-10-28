@@ -42,6 +42,10 @@ function draw() {
   background(theme.getBackground(255));
   railNetwork.drawTrackGuides();
   drawTracks();
+
+  // Labels on top. No line is selected yet, so every badge is full colour.
+  railNetwork.drawStationLabels();
+  railNetwork.drawLineBadges(null);
 }
 
 // Builds the map's tracks to fill the window.
