@@ -6,8 +6,11 @@
 // Keyboard: R resets (leaves listening mode), D switches between the light
 // and dark themes.
 //
-// p5's event functions (mousePressed() etc.) live in sketch.js and call
-// the matching handle...() method here.
+// On touch screens there is no hover, so a quick tap on a line enters
+// listening mode.
+//
+// p5's event functions (mousePressed(), touchStarted() etc.) live in
+// sketch.js and call the matching handle...() method here.
 //
 // AI acknowledgement: this class was written with the help of Claude
 // (Anthropic).

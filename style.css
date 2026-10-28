@@ -20,6 +20,9 @@ body {
 /* Stop the canvas leaving a small gap underneath it. */
 canvas {
   display: block;
+  /* Let the artwork handle finger drags itself, instead of the browser
+     scrolling or zooming the page. */
+  touch-action: none;
 }
 
 /* ---------- The controls ---------- */

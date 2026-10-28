@@ -41,7 +41,10 @@ function setup() {
 
   inputControls = new InputControls(railNetwork);
 
+  // Buttons respond to a mouse press, or to a finger lifting on a touch
+  // screen.
   theme.button.mousePressed(toggleTheme);
+  theme.button.touchEnded(toggleTheme);
   positionControls();
 }
 
@@ -120,6 +123,19 @@ function mousePressed() {
 
 function mouseReleased() {
   inputControls.handleMouseReleased();
+}
+
+// Touch screens. Returning false stops the browser from also sending
+// pretend mouse events afterwards (which would count every tap twice) and
+// from scrolling or zooming the page while you touch the artwork.
+function touchStarted() {
+  inputControls.handleMousePressed();
+  return false;
+}
+
+function touchEnded() {
+  inputControls.handleMouseReleased();
+  return false;
 }
 
 function keyPressed() {
