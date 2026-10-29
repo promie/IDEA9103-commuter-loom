@@ -35,7 +35,7 @@ Network this month      -> depth and speed of the breathing, and the sound mix:
                            rumble always, hum when fairly busy, taps only when busy
 ```
 
-## How to interact
+## The Interaction
 
 ![How to interact. Touch the fabric: hover the map to part the threads, press and hold to gather the grains, drag a line to pull it out (it springs back), click a line for listening mode; on a phone, drag, hold, drag a line or tap. Travel through time: it plays from July 2016 by itself, Space or the play button pauses, hover the timeline to preview a month, drag it, scroll or click a year to travel, arrow keys step a month. Sound and settings: click, tap or press a key to start the sound, the speaker button mutes it, the sun/moon switch or D changes theme, R resets.](docs/interactions.png)
 
@@ -55,11 +55,12 @@ The timed playback (`utils/timeline.js`) and the network's breathing (`utils/fab
 
 ### Perlin noise and randomness · Wanghao
 
-Each line is a band of thousands of persistent grains, short stitches and small knots, that travel along its track and wrap around at the end. Each grain gets its own random speed, lane, size and shape once, when it is created, so the cloth keeps a stable weave. Perlin noise makes each grain wander sideways from its lane, but only within half the gap to the neighbouring line, so lines never cross into each other. The monthly trip data sets how many grains show, how bright they are and how fast they move, so busy months look like dense, bright rope and quiet months like thin, dim thread. Hovering presses a soft dent into the fabric (`FabricPress`), so the threads part around the pointer.
+The grains themselves. Every train line is a band of thousands of small stitches and knots that weave along its track. `random()` gives each grain its own character once, `noise()` makes it sway like a slow current, and the month's trips decide how many show.
 
-**Try it:** let time play and watch busy months weave dense, bright rope while 2020 thins into broken, dim thread. Hover over a line and the threads part around the pointer.
+![Perlin noise and randomness: random once at birth, Perlin drift within half the gap to the next line, the data sets the density (dense in 2019, thin in 2020), and the fabric press parts the threads around the pointer](docs/mechanic-perlin.png)
 
-**How it works:**
+<details>
+<summary><b>How it works in the code</b></summary>
 
 - **Persistent grains and controlled randomness** (`mechanics/perlin-flow.js`): grains are created once per resize with `random()` and never re-rolled. Each grain has a random `showThreshold`; a month shows the grains whose threshold falls under its trip share, so changing month fades grains in and out instead of rebuilding the stream.
 - **Perlin noise drift**: `noise(position along track, time, grain offset)` pushes each grain along the track's normal. The drift limit is worked out from `LANE_GAP_UNITS`, so it scales with the map on resize.
@@ -67,26 +68,34 @@ Each line is a band of thousands of persistent grains, short stitches and small 
 - **Fabric press**: the push is the derivative of a Gaussian across the track (zero at the pointer, strongest about one grid unit away, fading to nothing), times a Gaussian along the track. It only moves where grains are drawn, never the route data.
 - **Fast drawing**: knots and stitches are added to a single canvas path and filled once per line through `drawingContext`, which keeps thousands of marks at about 60 fps. If the frame rate drops below 40 about 3 seconds in, the sketch switches to `pixelDensity(1)`.
 
+</details>
+
 ### Audio · Guangshun
 
-Three layered city sounds (rumble, hum and taps) whose volumes and pitch follow each month's network trips, so a busy month sounds full and the lockdowns sound nearly silent. `p5.FFT` analyses the mix every frame: bass squeezes each band tight onto its track, mids shear neighbouring lines against each other, treble makes the grains shiver, and the overall level deepens the breathing. A departure-board clack plays as each month flips over, and the speaker button mutes the sound without stopping the analysis.
+The city's sound, mixed by the data. Three layers (rumble, hum and taps) fill out in busy months and fade in quiet ones. `p5.FFT` then turns that same sound into movement: bass, mids and treble each push the grains in a different way.
 
-**Try it:** click once to start the sound, then drag the timeline into 2020 and hear the taps and then the hum fade until only the rumble is left. Mute it and the fabric keeps moving with the sound.
+![Audio: three city layers, the data mixes them (all three in 2019, a faint rumble in 2020), FFT bass squeezes, mids shear and treble shivers the grains, and loudness deepens the breathing with a clack on each month](docs/mechanic-audio.png)
 
-**How it works:**
+<details>
+<summary><b>How it works in the code</b></summary>
 
-- **Sound analysis**: `p5.FFT` with `getEnergy()` for bass, mid and treble, and `outputVolume()` for loudness. The analysis keeps running while muted, so the fabric still moves.
+- **Sound analysis**: `p5.FFT` with `getEnergy()` for bass, mid and treble, and `getLevel()` (their average) for loudness, which deepens the breathing. `followData()` sets each layer's volume and pitch from the month's busyness. Muting uses `outputVolume(0)`, so the analysis keeps running and the fabric still moves.
+
+</details>
 
 ### User input · Promie
 
-The visitor's hand on the fabric and their control of time. Holding the mouse (or a finger) gathers grains into the hand, dragging a line pulls that thread out of the network, and the flow speeds up near the hand; each grain then springs back onto its track. Clicking a line enters listening mode. Dragging the woven timeline, clicking a year, the scroll wheel and the arrow keys travel through time and pause playback; Space plays or pauses and R resets. Touch screens get the same controls through the touch events. The grains ask `InputControls` how the hand moves them (`getTouchAmount()`, `applyGather()`, `getPullWeight()`), so all the hand's rules live in one file.
+The visitor's hand on the fabric, and their control of time. Hold to gather the grains, drag a line to pull it out, click a line to listen to it, and travel through the ten years with the timeline or the keys. A mouse, keyboard and touch screen all work.
 
-**Try it:** press and hold to gather the threads, drag a line to pull it out and let it spring back, click a line to listen to it, and drag the timeline or use the arrow keys to travel through time.
+![User input: hold to gather the grains, drag a line to pull it and it springs back, click a line for listening mode, and travel through time with the timeline, scroll wheel or arrow keys](docs/mechanic-input.png)
 
-**How it works:**
+<details>
+<summary><b>How it works in the code</b></summary>
 
 - **The hand**: gathering pulls each grain towards the pointer with a strength that fades with distance. A pull finds where the line was grabbed on each branch (`RailNetwork.findGrabbedDistances()`) and moves grains by a Gaussian weight of their distance from that point, so the line bends like a pulled thread. A damped spring (The Nature of Code) brings everything back.
 - **Phones and tablets**: `touchStarted()`, `touchMoved()` and `touchEnded()` send touches to the same `InputControls` methods as the mouse, and return `false` so taps are not counted twice. Smaller screens get a compact layout and a data card above the dock, and `windowResized()` rebuilds the map and refills the grains.
+
+</details>
 
 ## How it's built
 

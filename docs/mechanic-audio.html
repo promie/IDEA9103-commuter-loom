@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio mechanic</title>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,400;0,600;0,700;1,400&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0e111a; display: flex; justify-content: center; padding: 2rem; }
+    .diagram-container { width: 100%; max-width: 1200px; overflow-x: auto; }
+    svg { width: 100%; min-width: 1200px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="diagram-container">
+    <svg viewBox="0 0 1200 498" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="mechanic-audio-title mechanic-audio-desc">
+      <title id="mechanic-audio-title">Audio mechanic, by Guangshun Wen</title>
+      <desc id="mechanic-audio-desc">The city's sound follows the data, and the same sound moves the grains. Three city layers: A low rumble, a warm hum and bright taps play together, looped. The data mixes it: A busy month plays all three; in the lockdowns only a faint, lower rumble is left. FFT moves the grains: Bass squeezes the bands, mids shear neighbouring lines, treble makes grains shiver. Breath and clack: Loudness deepens the breathing; a departure-board clack marks each month.</desc>
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#a3a9b8"/></marker>
+      </defs>
+<rect width="1200" height="600" fill="#0e111a"/>
+<rect x="0" y="0" width="6" height="600" fill="#14B866"/>
+<circle cx="64" cy="58" r="22" fill="#14B866"/>
+<text x="64" y="65" text-anchor="middle" font-family="Raleway, sans-serif" font-weight="700" font-size="20" fill="#0e111a">G</text>
+<text x="100" y="54" font-family="Raleway, sans-serif" font-weight="700" font-size="24" fill="#f2efe6">Audio</text>
+<text x="100" y="76" font-family="'Geist Mono', ui-monospace, monospace" font-size="11.5" fill="#14B866">GUANGSHUN WEN  <tspan fill="#8d93a1">·  mechanics/audio-reactive.js  ·  AudioReactive</tspan></text>
+<text x="40" y="118" font-family="Raleway, sans-serif" font-size="16" fill="#f2efe6">The city's sound follows the data, and the same sound moves the grains.</text>
+<rect x="40" y="140" width="265" height="268" rx="8" fill="#151925" stroke="rgba(242,239,230,0.12)"/>
+<rect x="40" y="140" width="265" height="140" rx="8" fill="#10131c"/>
+<rect x="40" y="272" width="265" height="8" fill="#10131c"/>
+<text x="56" y="164" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#14B866">01</text>
+<text x="58" y="182" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#3D86D6">RUMBLE</text>
+<polyline points="122,178.0 124,178.7 126,179.4 128,180.1 130,180.8 132,181.4 134,182.0 136,182.5 138,182.9 140,183.3 142,183.6 144,183.8 146,183.9 148,184.0 150,184.0 152,183.8 154,183.6 156,183.4 158,183.0 160,182.6 162,182.1 164,181.5 166,180.9 168,180.2 170,179.6 172,178.8 174,178.1 176,177.4 178,176.7 180,176.0 182,175.3 184,174.7 186,174.1 188,173.6 190,173.2 192,172.8 194,172.5 196,172.2 198,172.1 200,172.0 202,172.0 204,172.1 206,172.3 208,172.6 210,172.9 212,173.4 214,173.9 216,174.4 218,175.0 220,175.6 222,176.3 224,177.0 226,177.7 228,178.5 230,179.2 232,179.9 234,180.5 236,181.2 238,181.8 240,182.3 242,182.8 244,183.2 246,183.5 248,183.7 250,183.9 252,184.0 254,184.0 256,183.9 258,183.7 260,183.5 262,183.1 264,182.7 266,182.2 268,181.7 270,181.1 272,180.5 274,179.8 276,179.1 278,178.4 280,177.7 282,177.0" fill="none" stroke="#3D86D6" stroke-width="1.8" opacity="1"/>
+<text x="122" y="200" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-size="9" fill="#8d93a1">trains in tunnels</text>
+<text x="58" y="218" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#14B866">HUM</text>
+<polyline points="122,214.0 124,216.5 126,218.8 128,220.7 130,222.1 132,222.9 134,222.9 136,222.3 138,221.1 140,219.2 142,217.0 144,214.6 146,212.0 148,209.7 150,207.7 152,206.2 154,205.2 156,205.0 158,205.5 160,206.6 162,208.3 164,210.5 166,212.9 168,215.4 170,217.8 172,219.9 174,221.6 176,222.6 178,223.0 180,222.7 182,221.7 184,220.1 186,218.0 188,215.7 190,213.1 192,210.7 194,208.5 196,206.8 198,205.6 200,205.0 202,205.2 204,206.0 206,207.5 208,209.5 210,211.8 212,214.3 214,216.8 216,219.0 218,220.9 220,222.2 222,222.9 224,222.9 226,222.2 228,220.9 230,219.0 232,216.7 234,214.3 236,211.8 238,209.4 240,207.5 242,206.0 244,205.2 246,205.0 248,205.6 250,206.8 252,208.6 254,210.7 256,213.2 258,215.7 260,218.1 262,220.1 264,221.7 266,222.7 268,223.0 270,222.6 272,221.5 274,219.9 276,217.8 278,215.4 280,212.8 282,210.4" fill="none" stroke="#14B866" stroke-width="1.8" opacity="1"/>
+<text x="122" y="236" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-size="9" fill="#8d93a1">a crowd's murmur</text>
+<text x="58" y="254" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#F5A93F">TAPS</text>
+<polyline points="122,258.2 124,260.6 126,244.7 128,243.0 130,253.8 132,251.4 134,252.2 136,248.5 138,254.9 140,253.2 142,249.8 144,240.9 146,247.1 148,249.3 150,257.0 152,260.9 154,257.2 156,247.9 158,246.8 160,246.3 162,244.4 164,244.0 166,249.3 168,244.2 170,245.1 172,256.7 174,252.8 176,254.0 178,246.1 180,239.4 182,243.9 184,242.2 186,251.8 188,262.0 190,254.7 192,243.0 194,254.1 196,253.4 198,255.1 200,260.2 202,257.0 204,254.7 206,244.6 208,256.2 210,258.4 212,246.5 214,257.3 216,254.2 218,247.0 220,247.7 222,249.0 224,259.7 226,253.0 228,257.2 230,245.7 232,253.9 234,255.6 236,250.6 238,254.2 240,259.5 242,253.1 244,246.9 246,242.8 248,247.3 250,256.4 252,246.5 254,257.3 256,243.3 258,254.7 260,246.2 262,260.6 264,256.6 266,250.8 268,248.3 270,249.8 272,250.4 274,248.3 276,247.7 278,251.8 280,256.5 282,249.2" fill="none" stroke="#F5A93F" stroke-width="1.8" opacity="1"/>
+<text x="122" y="272" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-size="9" fill="#8d93a1">Opal cards</text>
+<line x1="40" y1="280" x2="305" y2="280" stroke="rgba(242,239,230,0.08)"/>
+<text x="56" y="308" font-family="Raleway, sans-serif" font-weight="700" font-size="15" fill="#f2efe6">Three city layers</text>
+<text x="56" y="330" font-family="Raleway, sans-serif" font-size="12.5" fill="#a3a9b8">A low rumble, a warm hum and bright</text>
+<text x="56" y="347" font-family="Raleway, sans-serif" font-size="12.5" fill="#a3a9b8">taps play together, looped.</text>
+<text x="56" y="392" font-family="'Geist Mono', ui-monospace, monospace" font-size="11" fill="#e8a75e">loadSound() · loop()</text>
+<rect x="325" y="140" width="265" height="268" rx="8" fill="#151925" stroke="rgba(242,239,230,0.12)"/>
+<rect x="325" y="140" width="265" height="140" rx="8" fill="#10131c"/>
+<rect x="325" y="272" width="265" height="8" fill="#10131c"/>
+<text x="341" y="164" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#14B866">02</text>
+<rect x="365" y="174" width="12" height="70" rx="3" fill="#222838"/>
+<rect x="365" y="174.0" width="12" height="70.0" rx="3" fill="#3D86D6"/>
+<rect x="389" y="174" width="12" height="70" rx="3" fill="#222838"/>
+<rect x="389" y="174.0" width="12" height="70.0" rx="3" fill="#14B866"/>
+<rect x="413" y="174" width="12" height="70" rx="3" fill="#222838"/>
+<rect x="413" y="174.0" width="12" height="70.0" rx="3" fill="#F5A93F"/>
+<text x="395" y="262" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#e8a75e">2019</text>
+<rect x="485" y="174" width="12" height="70" rx="3" fill="#222838"/>
+<rect x="485" y="219.5" width="12" height="24.5" rx="3" fill="#3D86D6"/>
+<rect x="509" y="174" width="12" height="70" rx="3" fill="#222838"/>
+<rect x="509" y="238.4" width="12" height="5.6" rx="3" fill="#14B866"/>
+<rect x="533" y="174" width="12" height="70" rx="3" fill="#222838"/>
+<rect x="533" y="244.0" width="12" height="0.0" rx="3" fill="#F5A93F"/>
+<text x="515" y="262" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#8d93a1">2020</text>
+<line x1="445" y1="208" x2="475" y2="208" stroke="#a3a9b8" stroke-width="1.4" marker-end="url(#arrow)"/>
+<line x1="325" y1="280" x2="590" y2="280" stroke="rgba(242,239,230,0.08)"/>
+<text x="341" y="308" font-family="Raleway, sans-serif" font-weight="700" font-size="15" fill="#f2efe6">The data mixes it</text>
+<text x="341" y="330" font-family="Raleway, sans-serif" font-size="12.5" fill="#a3a9b8">A busy month plays all three; in the</text>
+<text x="341" y="347" font-family="Raleway, sans-serif" font-size="12.5" fill="#a3a9b8">lockdowns only a faint, lower rumble</text>
+<text x="341" y="364" font-family="Raleway, sans-serif" font-size="12.5" fill="#a3a9b8">is left.</text>
+<text x="341" y="392" font-family="'Geist Mono', ui-monospace, monospace" font-size="11" fill="#e8a75e">followData()</text>
+<rect x="610" y="140" width="265" height="268" rx="8" fill="#151925" stroke="rgba(242,239,230,0.12)"/>
+<rect x="610" y="140" width="265" height="140" rx="8" fill="#10131c"/>
+<rect x="610" y="272" width="265" height="8" fill="#10131c"/>
+<text x="626" y="164" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#14B866">03</text>
+<rect x="630.0" y="184.8" width="6.3" height="43.2" rx="1" fill="#3D86D6"/>
+<rect x="638.3" y="183.3" width="6.3" height="44.7" rx="1" fill="#3D86D6"/>
+<rect x="646.6" y="183.3" width="6.3" height="44.7" rx="1" fill="#3D86D6"/>
+<rect x="654.9" y="181.4" width="6.3" height="46.6" rx="1" fill="#3D86D6"/>
+<rect x="663.2" y="187.0" width="6.3" height="41.0" rx="1" fill="#3D86D6"/>
+<rect x="671.5" y="184.6" width="6.3" height="43.4" rx="1" fill="#3D86D6"/>
+<rect x="679.8" y="203.5" width="6.3" height="24.5" rx="1" fill="#3D86D6"/>
+<rect x="688.1" y="195.9" width="6.3" height="32.1" rx="1" fill="#3D86D6"/>
+<rect x="696.4" y="188.2" width="6.3" height="39.8" rx="1" fill="#3D86D6"/>
+<text x="667.35" y="244" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" fill="#3D86D6">BASS</text>
+<text x="667.35" y="260" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" fill="#a3a9b8">→ squeeze</text>
+<rect x="704.7" y="194.8" width="6.3" height="33.2" rx="1" fill="#14B866"/>
+<rect x="713.0" y="191.7" width="6.3" height="36.3" rx="1" fill="#14B866"/>
+<rect x="721.3" y="206.0" width="6.3" height="22.0" rx="1" fill="#14B866"/>
+<rect x="729.6" y="201.2" width="6.3" height="26.8" rx="1" fill="#14B866"/>
+<rect x="737.9" y="205.7" width="6.3" height="22.3" rx="1" fill="#14B866"/>
+<rect x="746.2" y="202.3" width="6.3" height="25.7" rx="1" fill="#14B866"/>
+<rect x="754.5" y="202.9" width="6.3" height="25.1" rx="1" fill="#14B866"/>
+<rect x="762.8" y="211.5" width="6.3" height="16.5" rx="1" fill="#14B866"/>
+<rect x="771.1" y="209.7" width="6.3" height="18.3" rx="1" fill="#14B866"/>
+<text x="742.05" y="244" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" fill="#14B866">MID</text>
+<text x="742.05" y="260" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" fill="#a3a9b8">→ shear</text>
+<rect x="779.4" y="209.9" width="6.3" height="18.1" rx="1" fill="#F5A93F"/>
+<rect x="787.7" y="203.6" width="6.3" height="24.4" rx="1" fill="#F5A93F"/>
+<rect x="796.0" y="206.5" width="6.3" height="21.5" rx="1" fill="#F5A93F"/>
+<rect x="804.3" y="213.9" width="6.3" height="14.1" rx="1" fill="#F5A93F"/>
+<rect x="812.6" y="208.7" width="6.3" height="19.3" rx="1" fill="#F5A93F"/>
+<rect x="820.9" y="215.9" width="6.3" height="12.1" rx="1" fill="#F5A93F"/>
+<rect x="829.2" y="212.8" width="6.3" height="15.2" rx="1" fill="#F5A93F"/>
+<rect x="837.5" y="217.7" width="6.3" height="10.3" rx="1" fill="#F5A93F"/>
+<rect x="845.8" y="219.4" width="6.3" height="8.6" rx="1" fill="#F5A93F"/>
+<text x="816.75" y="244" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" fill="#F5A93F">TREBLE</text>
+<text x="816.75" y="260" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" fill="#a3a9b8">→ shiver</text>
+<line x1="610" y1="280" x2="875" y2="280" stroke="rgba(242,239,230,0.08)"/>
+<text x="626" y="308" font-family="Raleway, sans-serif" font-weight="700" font-size="15" fill="#f2efe6">FFT moves the grains</text>
+<text x="626" y="330" font-family="Raleway, sans-serif" font-size="12.5" fill="#a3a9b8">Bass squeezes the bands, mids shear</text>
+<text x="626" y="347" font-family="Raleway, sans-serif" font-size="12.5" fill="#a3a9b8">neighbouring lines, treble makes</text>
+<text x="626" y="364" font-family="Raleway, sans-serif" font-size="12.5" fill="#a3a9b8">grains shiver.</text>
+<text x="626" y="392" font-family="'Geist Mono', ui-monospace, monospace" font-size="11" fill="#e8a75e">p5.FFT · getEnergy()</text>
+<rect x="895" y="140" width="265" height="268" rx="8" fill="#151925" stroke="rgba(242,239,230,0.12)"/>
+<rect x="895" y="140" width="265" height="140" rx="8" fill="#10131c"/>
+<rect x="895" y="272" width="265" height="8" fill="#10131c"/>
+<text x="911" y="164" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#14B866">04</text>
+<circle cx="965" cy="210" r="34" fill="#e8a75e" opacity="0.15"/>
+<circle cx="965" cy="210" r="24" fill="#e8a75e" opacity="0.35"/>
+<circle cx="965" cy="210" r="14" fill="#e8a75e" opacity="1"/>
+<text x="965" y="262" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" fill="#8d93a1">loudness → breath</text>
+<rect x="1055" y="184" width="70" height="44" rx="5" fill="#222838" stroke="rgba(242,239,230,0.2)" opacity="0.35" transform="translate(0,0)"/>
+<rect x="1055" y="184" width="70" height="44" rx="5" fill="#222838" stroke="rgba(242,239,230,0.2)" opacity="1" transform="translate(8,8)"/>
+<line x1="1063" y1="214" x2="1133" y2="214" stroke="#0e111a" stroke-width="1.5"/>
+<text x="1098" y="212" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-size="11" fill="#e8a75e">APR 2020</text>
+<text x="1098" y="262" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" fill="#8d93a1">clack on each month</text>
+<line x1="895" y1="280" x2="1160" y2="280" stroke="rgba(242,239,230,0.08)"/>
+<text x="911" y="308" font-family="Raleway, sans-serif" font-weight="700" font-size="15" fill="#f2efe6">Breath and clack</text>
+<text x="911" y="330" font-family="Raleway, sans-serif" font-size="12.5" fill="#a3a9b8">Loudness deepens the breathing; a</text>
+<text x="911" y="347" font-family="Raleway, sans-serif" font-size="12.5" fill="#a3a9b8">departure-board clack marks each</text>
+<text x="911" y="364" font-family="Raleway, sans-serif" font-size="12.5" fill="#a3a9b8">month.</text>
+<text x="911" y="392" font-family="'Geist Mono', ui-monospace, monospace" font-size="11" fill="#e8a75e">getLevel() · playFlip()</text>
+<rect x="40" y="428" width="1120" height="40" rx="6" fill="#14B866" fill-opacity="0.1" stroke="#14B866" stroke-opacity="0.5"/>
+<text x="58" y="453" font-family="'Geist Mono', ui-monospace, monospace" font-size="11" letter-spacing="1.4" fill="#14B866">TRY IT</text>
+<text x="122" y="453" font-family="Raleway, sans-serif" font-size="13.5" fill="#f2efe6">Click once to start the sound · drag the timeline into 2020 and hear it empty · mute it and the fabric still moves</text>
+    </svg>
+  </div>
+</body>
+</html>
