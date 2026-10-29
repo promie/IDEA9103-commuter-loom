@@ -6,8 +6,8 @@
 // object for each part of the artwork, and calls them every frame. The
 // actual work happens in the classes:
 //   utils/      ColourTheme, TripData, RailNetwork + TrackPath
-//   mechanics/  LineStream + Grain (Perlin noise and randomness),
-//               InputControls (user input)
+//   mechanics/  LineStream + Grain + FabricPress (Perlin noise and
+//               randomness), InputControls (user input)
 
 // Monthly Opal trips for each Sydney Trains line, made from the raw
 // Transport for NSW data (data/train.csv) by script/clean_data.py.
@@ -23,8 +23,15 @@ let theme;
 let tripData;
 let railNetwork;
 let inputControls;
-// One stream of grains per line (mechanics/perlin-flow.js).
+// One stream of grains per line, and the dent the pointer presses into
+// them (mechanics/perlin-flow.js).
 let lineStreams = [];
+let fabricPress;
+
+// Whether the pointer is on the canvas: a mouse over it, or a finger
+// touching it. Touch screens have no hover, so a lifted finger stops
+// pressing.
+let pointerOnCanvas = false;
 
 // Fallback: set to true to draw the old solid tracks instead of the grains.
 const SHOW_SOLID_TRACKS = false;
@@ -32,7 +39,7 @@ const SHOW_SOLID_TRACKS = false;
 // Temporary, until there is a timeline: which month the artwork shows.
 // null shows the latest month in the data. To test another month, put its
 // number here: 0 = July 2016, 1 = August 2016, ... 45 = April 2020,
-// ... 121 = August 2026. The month shown is printed in the browser console.
+// ... 121 = August 2026.
 const TEST_MONTH_INDEX = null;
 // The month the grains show, worked out in setup().
 let monthIndex = 0;
@@ -43,7 +50,8 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  let canvas = createCanvas(windowWidth, windowHeight);
+  canvas.mouseOut(handlePointerLeft);
 
   // The dark theme is the default. getURLParams() reads the page address,
   // so ...index.html?theme=light starts in the light theme.
@@ -58,12 +66,12 @@ function setup() {
   } else {
     monthIndex = constrain(TEST_MONTH_INDEX, 0, tripData.getMonthCount() - 1);
   }
-  console.log("Commuter Loom is showing " + tripData.months[monthIndex] + " (month index " + monthIndex + ")");
 
   for (let lineName of LINE_NAMES) {
     lineStreams.push(new LineStream(lineName, tripData));
   }
   fillStreams();
+  fabricPress = new FabricPress();
 
   inputControls = new InputControls(railNetwork);
 
@@ -77,6 +85,10 @@ function setup() {
 function draw() {
   background(theme.getBackground(255));
   railNetwork.drawTrackGuides();
+  // The pointer presses into the threads while it is over the map, and
+  // presses deeper while the mouse button or a finger is held down.
+  let pointerOverMap = pointerOnCanvas && mouseY < railNetwork.mapBottom;
+  fabricPress.update(mouseX, mouseY, pointerOverMap, mouseIsPressed);
   if (SHOW_SOLID_TRACKS) {
     drawTracks(inputControls.selectedLineName);
   } else {
@@ -116,9 +128,10 @@ function fillStreams() {
   }
 }
 
-// Moves and draws every line's grains, with the density and speed of the
-// month shown. In listening mode the selected line is drawn last (on top)
-// and the others fade back, as the solid tracks below did.
+// Moves and draws every line's grains, with the density, speed and
+// brightness of the month shown, pressed by the pointer. In listening mode
+// the selected line is drawn last (on top) and the others fade back, as
+// the solid tracks below did.
 function drawStreams(selectedLineName) {
   let selectedStream = null;
   for (let stream of lineStreams) {
@@ -131,11 +144,11 @@ function drawStreams(selectedLineName) {
       if (selectedLineName !== null) {
         lineColour.setAlpha(60);
       }
-      stream.draw(lineColour);
+      stream.draw(lineColour, fabricPress);
     }
   }
   if (selectedStream !== null) {
-    selectedStream.draw(color(theme.getLineColour(selectedStream.lineName)));
+    selectedStream.draw(color(theme.getLineColour(selectedStream.lineName)), fabricPress);
   }
 }
 
@@ -172,13 +185,21 @@ function drawLineTracks(lineName, lineColour) {
   }
 }
 
-// p5 event functions: each one hands the event to the input mechanic.
+// p5 event functions: each one hands the event to the input mechanic, and
+// notes whether the pointer is on the canvas (for the fabric press).
 function mouseMoved() {
+  pointerOnCanvas = true;
   inputControls.handleMouseMoved();
 }
 
 function mousePressed() {
+  pointerOnCanvas = true;
   inputControls.handleMousePressed();
+}
+
+// Canvas callback: the mouse has left the canvas, so the press lifts.
+function handlePointerLeft() {
+  pointerOnCanvas = false;
 }
 
 function mouseReleased() {
@@ -189,11 +210,13 @@ function mouseReleased() {
 // pretend mouse events afterwards (which would count every tap twice) and
 // from scrolling or zooming the page while you touch the artwork.
 function touchStarted() {
+  pointerOnCanvas = true;
   inputControls.handleMousePressed();
   return false;
 }
 
 function touchEnded() {
+  pointerOnCanvas = false;
   inputControls.handleMouseReleased();
   return false;
 }

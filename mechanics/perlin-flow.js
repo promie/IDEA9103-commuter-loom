@@ -1,32 +1,37 @@
 // perlin-flow.js  —  MECHANIC: Perlin noise and randomness
 // Mechanic owner: Wanghao Jin (wjin0936)
 //
-// Each train line becomes a stream of small coloured grains that travel
-// along its tracks, so the network reads as a woven textile rather than a
-// set of solid lines:
+// Each train line becomes a rope of small coloured marks that travel along
+// its tracks, so the network reads as a woven textile rather than a set of
+// solid lines:
 //   - a LineStream holds every grain of one train line (all its branches)
-//   - a Grain is one particle that lives on one branch (one TrackPath)
+//   - a Grain is one particle that lives on one branch (one TrackPath).
+//     Most grains are drawn as short "stitches" lying along the track;
+//     the rest are small square "knots".
+//   - a FabricPress is the soft dent the pointer makes when it presses
+//     into the threads (see the bottom of this file)
 //
 // Grains are created once and then keep moving: they are never thrown
 // away and re-made each frame. Each grain is given its own random
 // character when it is created (where it starts, how fast it travels, how
-// big it is, and which side of the track it runs on), and keeps it for its
-// whole life. That way the stream looks varied, but nothing flickers.
+// big it is, which side of the track it runs on, whether it is a stitch or
+// a knot), and keeps it for its whole life. That way the stream looks
+// varied, but nothing flickers.
 //
-// On top of that, Perlin noise makes the grains drift gently from side to
-// side across their track, like threads moving in a slow current. The
-// drift is smooth (noise changes gradually, unlike random()), and it only
-// ever pushes a grain across its own track, never along it or off into
-// open canvas. It is capped so a line never drifts into its neighbour.
-//
-// Random values give each grain its own fixed character; Perlin noise gives
-// the whole stream its smooth, ever-changing movement.
+// Perlin noise makes the grains drift gently from side to side across
+// their track, like threads moving in a slow current. The drift is smooth
+// (noise changes gradually, unlike random()), it only ever pushes a grain
+// across its own track, and it is capped so a line never drifts into its
+// neighbour.
 //
 // The real Opal trip data (TripData) decides how many grains each line
-// shows and how fast its stream flows: busier lines and busier months are
-// denser and quicker, quiet months thin out into broken, slower threads.
-// So the three jobs stay separate: the data sets how much is moving,
-// random() sets each grain's character, and noise() sets how it sways.
+// shows, how fast its stream flows and how brightly it glows: busier lines
+// and months are denser, quicker and brighter; quiet months thin out into
+// broken, slower, dimmer threads.
+//
+// So each job stays separate: the data sets how much is moving, random()
+// sets each grain's character, noise() sets how it sways, and the
+// FabricPress adds a temporary dent on top where the pointer presses.
 //
 // Sizes, spacing and speeds are measured in grid units (railNetwork.gridUnit)
 // instead of pixels, so the textile looks the same on a phone and on a big
@@ -36,20 +41,22 @@
 // (Anthropic). It moves each grain along a TrackPath with the path's own
 // findSegmentIndex() and getPositionAt() methods, uses p5's random() to
 // give every grain its individual properties, p5's noise() for the
-// sideways drift, and TripData's getLineVolume() and getTripRatio() for
-// the density and speed.
+// sideways drift, TripData's getLineVolume() and getTripRatio() for the
+// density, speed and brightness, and a Gaussian falloff for the press.
+
+// ---- Grains ----
 
 // Average gap between neighbouring grains along a track, in grid units,
 // for the busiest line in a normal month. Smaller numbers make denser (and
 // slower to draw) streams.
-const FLOW_GRAIN_SPACING_UNITS = 0.1;
+const FLOW_GRAIN_SPACING_UNITS = 0.07;
 
 // A safety limit so a very long branch can never create too many grains.
-const FLOW_MAX_GRAINS_PER_PATH = 900;
+const FLOW_MAX_GRAINS_PER_PATH = 1500;
 
 // How far either side of its track centre a grain sits before any drift,
 // in grid units. The Perlin noise drift below is added on top of this.
-const FLOW_BAND_HALF_WIDTH_UNITS = 0.16;
+const FLOW_BAND_HALF_WIDTH_UNITS = 0.17;
 
 // How far an average grain travels each frame, in grid units.
 const FLOW_BASE_SPEED_UNITS = 0.03;
@@ -58,21 +65,32 @@ const FLOW_BASE_SPEED_UNITS = 0.03;
 const FLOW_MIN_SPEED_FACTOR = 0.6;
 const FLOW_MAX_SPEED_FACTOR = 1.4;
 
-// The range of each grain's random size (its width), in grid units.
-const FLOW_MIN_GRAIN_SIZE_UNITS = 0.05;
-const FLOW_MAX_GRAIN_SIZE_UNITS = 0.11;
+// The share of grains drawn as square knots; the rest are stitches.
+const FLOW_KNOT_SHARE = 0.5;
+
+// The range of a knot's random size (its width), in grid units.
+const FLOW_MIN_GRAIN_SIZE_UNITS = 0.06;
+const FLOW_MAX_GRAIN_SIZE_UNITS = 0.12;
+
+// Stitches come in two thread thicknesses (chosen at random per grain),
+// and a random length. Faster grains get longer stitches, so the flow
+// reads as streaks along the track.
+const FLOW_THIN_STITCH_UNITS = 0.05;
+const FLOW_THICK_STITCH_UNITS = 0.08;
+const FLOW_MIN_STITCH_LENGTH_UNITS = 0.08;
+const FLOW_MAX_STITCH_LENGTH_UNITS = 0.16;
 
 // ---- Perlin noise drift ----
 
 // The smallest gap to keep between the grains of two neighbouring lines.
-const FLOW_LANE_CLEARANCE_UNITS = 0.02;
+const FLOW_LANE_CLEARANCE_UNITS = 0.015;
 
 // The furthest the noise may push a grain sideways, in grid units, worked
 // out from the real track spacing. Neighbouring lines in a bundle are
 // LANE_GAP_UNITS apart (from rail-network.js), so each line may use half
-// of that. From that half we take away the band, the grain's own size (its
-// half-diagonal, 0.71 x its width, for tracks at 45 degrees) and the
-// clearance. With the values above this is about 0.1 grid units.
+// of that. From that half we take away the band, the biggest knot's
+// half-diagonal (0.71 x its width, for tracks at 45 degrees) and the
+// clearance. With the values above this is about 0.09 grid units.
 // (Math.max is plain JavaScript: p5's max() is not ready yet when this
 // line runs.)
 const FLOW_MAX_DRIFT_UNITS = Math.max(
@@ -98,7 +116,7 @@ const FLOW_NOISE_GRAIN_SPREAD = 0.6;
 const FLOW_NOISE_LOW = 0.25;
 const FLOW_NOISE_HIGH = 0.75;
 
-// ---- Trip data: density and speed ----
+// ---- Trip data: density, speed and brightness ----
 
 // How dense the quietest line (T7) is in a normal month, compared with the
 // busiest line (T1). Taken from TripData.getLineVolume(), which compares the
@@ -115,10 +133,44 @@ const FLOW_MAX_PEAK_TRIP_RATIO = 2;
 const FLOW_QUIET_SPEED_SCALE = 0.6;
 const FLOW_BUSY_SPEED_SCALE = 1.2;
 
-// How quickly density and speed catch up with a new month (the share of
-// the remaining difference covered each frame). Small numbers mean grains
-// appear and disappear gradually over about a second, not all at once.
+// Brightness follows the trip ratio in the same way: a month with no trips
+// would glow at 45% opacity, a normal or busier month at full opacity.
+const FLOW_QUIET_INTENSITY = 0.45;
+
+// How quickly density, speed and brightness catch up with a new month (the
+// share of the remaining difference covered each frame). Small numbers
+// mean grains appear and disappear gradually over about a second.
 const FLOW_DATA_EASING = 0.05;
+
+// ---- Pointer press ----
+
+// The dent's size, in grid units: how far it reaches across the track
+// (sideways) and along it. It fades smoothly with a Gaussian (bell-shaped)
+// curve, so it is strongest under the pointer and gentle at its edges.
+const FLOW_PRESS_WIDTH_UNITS = 1.0;
+const FLOW_PRESS_LENGTH_UNITS = 1.5;
+
+// How hard the press pushes, as a multiple of FLOW_PRESS_WIDTH_UNITS.
+// Hovering presses lightly; holding the mouse button (or a finger) down
+// presses deeper. Keeping the deep press below 2.2 means threads are
+// squeezed together but never pushed past each other, so the bundle keeps
+// its order.
+const FLOW_PRESS_HOVER_DEPTH = 1.3;
+const FLOW_PRESS_HELD_DEPTH = 2.0;
+
+// Beyond this many widths the dent is too faint to matter, so grains
+// further away skip the maths.
+const FLOW_PRESS_REACH = 3.5;
+
+// How quickly the dent follows the pointer and grows or fades (share of
+// the remaining difference covered each frame).
+const FLOW_PRESS_FOLLOW = 0.35;
+const FLOW_PRESS_EASING = 0.08;
+
+// How quickly each grain moves to where the press wants it. Below 1, so the
+// threads give way softly and spring back gradually (over about a second)
+// when the press lifts.
+const FLOW_GRAIN_SPRING = 0.12;
 
 // One particle on one branch of a line.
 class Grain {
@@ -131,8 +183,6 @@ class Grain {
     this.distance = random(0, path.totalLength);
     // How fast it travels compared with the average grain.
     this.speedFactor = random(FLOW_MIN_SPEED_FACTOR, FLOW_MAX_SPEED_FACTOR);
-    // Its width, in grid units.
-    this.sizeUnits = random(FLOW_MIN_GRAIN_SIZE_UNITS, FLOW_MAX_GRAIN_SIZE_UNITS);
     // Which side of the track it runs on: -1 is one edge of the band,
     // 0 the centre, 1 the other edge.
     this.laneOffset = random(-1, 1);
@@ -144,6 +194,25 @@ class Grain {
     // only the grains with the lowest numbers show. The busier the month,
     // the more grains join in, and the same grains always show first.
     this.showThreshold = random(0, 1);
+
+    // What it looks like: a square knot, or a stitch along the track.
+    this.isKnot = random(1) < FLOW_KNOT_SHARE;
+    // A knot's width, in grid units.
+    this.sizeUnits = random(FLOW_MIN_GRAIN_SIZE_UNITS, FLOW_MAX_GRAIN_SIZE_UNITS);
+    // A stitch's thread: thin or thick, and its length (faster = longer).
+    this.isThickStitch = random(1) < 0.5;
+    this.lengthUnits = random(FLOW_MIN_STITCH_LENGTH_UNITS, FLOW_MAX_STITCH_LENGTH_UNITS) * this.speedFactor;
+
+    // How far the pointer's press currently pushes it sideways, in pixels.
+    // It eases towards the press (see locate()), so it springs back softly.
+    this.pressOffset = 0;
+
+    // Whether it is drawn this frame, and where, filled in by locate().
+    this.isShown = false;
+    this.x = 0;
+    this.y = 0;
+    this.tangentX = 1;
+    this.tangentY = 0;
 
     // Which pair of track points the grain is between. Remembering it means
     // the path only has to search a step or two each frame.
@@ -184,27 +253,42 @@ class Grain {
     return side * stream.maxDrift;
   }
 
-  // Draws the grain. stream.position is an object shared by every grain in
-  // the stream, filled in by the path, so no new object is made each frame.
-  draw(stream) {
+  // Works out where to draw the grain this frame, and stores it in this.x,
+  // this.y and this.tangentX/Y (the direction of the track). Returns false
+  // if the grain is off the screen. stream.position is an object shared by
+  // every grain in the stream, so no new object is made each frame.
+  locate(stream, press) {
     let position = stream.position;
     this.path.getPositionAt(this.distance, this.segmentIndex, position);
+    let normalX = position.normalX;
+    let normalY = position.normalY;
 
     // Step sideways from the track centre along the normal (the direction
     // pointing across the track): first to the grain's own fixed place in
     // the band, then by the Perlin noise drift.
     let sideways = this.laneOffset * stream.bandHalfWidth + this.getDrift(stream);
-    let x = position.x + position.normalX * sideways;
-    let y = position.y + position.normalY * sideways;
+    let x = position.x + normalX * sideways;
+    let y = position.y + normalY * sideways;
+
+    // Then by the pointer's press, eased so the thread gives way and
+    // recovers softly instead of snapping.
+    let pressTarget = press.getPush(x, y, normalX, normalY, stream);
+    this.pressOffset = lerp(this.pressOffset, pressTarget, FLOW_GRAIN_SPRING);
+    x += normalX * this.pressOffset;
+    y += normalY * this.pressOffset;
 
     // Parts of some lines (Emu Plains, Berowra...) run off the screen.
-    let size = this.sizeUnits * stream.gridUnit;
-    if (x < -size || x > width + size || y < -size || y > height + size) {
-      return;
+    let margin = stream.gridUnit * FLOW_MAX_STITCH_LENGTH_UNITS * FLOW_MAX_SPEED_FACTOR;
+    if (x < -margin || x > width + margin || y < -margin || y > height + margin) {
+      return false;
     }
-    // A tiny square reads as a woven grain, and with thousands of grains
-    // it is noticeably faster to draw than circle().
-    square(x, y, size);
+
+    this.x = x;
+    this.y = y;
+    // The track direction is the normal turned back 90 degrees.
+    this.tangentX = normalY;
+    this.tangentY = -normalX;
+    return true;
   }
 }
 
@@ -224,21 +308,24 @@ class LineStream {
     // gets enough grains for that month, and fewer are shown in quieter ones.
     this.peakTripRatio = this.findPeakTripRatio();
 
-    // The share of grains shown (0 to 1) and the speed scale, for the month
-    // shown. "target" values are set by setMonth(); the others ease towards
-    // them in update(). Starting at 0 means the streams weave themselves
-    // in when the page opens.
+    // The share of grains shown (0 to 1), the speed scale and the
+    // brightness, for the month shown. "target" values are set by
+    // setMonth(); the others ease towards them in update(). Starting at 0
+    // means the streams weave themselves in when the page opens.
     this.visibleShare = 0;
     this.targetVisibleShare = 0;
     this.speedScale = 1;
     this.targetSpeedScale = 1;
+    this.intensity = FLOW_QUIET_INTENSITY;
+    this.targetIntensity = 1;
 
-    // Pixels per grid unit, copied from the rail network in fillWithGrains().
+    // Pixels per grid unit, copied from the rail network in fillWithGrains(),
+    // and the sizes below in pixels for this window size.
     this.gridUnit = 1;
-    // The band half-width and the largest drift, in pixels for this
-    // window size. Also set in fillWithGrains().
     this.bandHalfWidth = 0;
     this.maxDrift = 0;
+    this.thinStitchWeight = 1;
+    this.thickStitchWeight = 1;
 
     // Where this line's ripples start in the noise, chosen at random once,
     // so every line swings in its own pattern instead of all in step.
@@ -250,6 +337,16 @@ class LineStream {
     this.position = {};
   }
 
+  // The largest getTripRatio() of any month in the data, i.e. how much
+  // busier than normal this line's busiest month was. Worked out once.
+  findPeakTripRatio() {
+    let peak = 1;
+    for (let monthIndex = 0; monthIndex < this.tripData.getMonthCount(); monthIndex++) {
+      peak = max(peak, this.tripData.getTripRatio(this.lineName, monthIndex));
+    }
+    return min(peak, FLOW_MAX_PEAK_TRIP_RATIO);
+  }
+
   // Creates this line's grains on its tracks. Called from setup(), and
   // again after a window resize, because the rail network then builds
   // brand new TrackPath objects with new lengths.
@@ -257,6 +354,8 @@ class LineStream {
     this.gridUnit = gridUnit;
     this.bandHalfWidth = FLOW_BAND_HALF_WIDTH_UNITS * gridUnit;
     this.maxDrift = FLOW_MAX_DRIFT_UNITS * gridUnit;
+    this.thinStitchWeight = FLOW_THIN_STITCH_UNITS * gridUnit;
+    this.thickStitchWeight = FLOW_THICK_STITCH_UNITS * gridUnit;
     this.grains = [];
     for (let path of paths) {
       // Longer tracks get more grains. particleShare gives each branch of a
@@ -273,19 +372,10 @@ class LineStream {
     }
   }
 
-  // The largest getTripRatio() of any month in the data, i.e. how much
-  // busier than normal this line's busiest month was. Worked out once.
-  findPeakTripRatio() {
-    let peak = 1;
-    for (let monthIndex = 0; monthIndex < this.tripData.getMonthCount(); monthIndex++) {
-      peak = max(peak, this.tripData.getTripRatio(this.lineName, monthIndex));
-    }
-    return min(peak, FLOW_MAX_PEAK_TRIP_RATIO);
-  }
-
-  // Reads the month's trips for this line and sets the density and speed
-  // to move towards. tripRatio is this month compared with the line's own
-  // normal month, so a quiet month thins every line by the same proportion.
+  // Reads the month's trips for this line and sets the density, speed and
+  // brightness to move towards. tripRatio is this month compared with the
+  // line's own normal month, so a quiet month thins every line by the same
+  // proportion.
   setMonth(monthIndex) {
     let tripRatio = this.tripData.getTripRatio(this.lineName, monthIndex);
 
@@ -301,16 +391,20 @@ class LineStream {
       FLOW_QUIET_SPEED_SCALE,
       FLOW_BUSY_SPEED_SCALE
     );
+
+    // Quieter months glow more faintly.
+    this.targetIntensity = constrain(map(tripRatio, 0, 1, FLOW_QUIET_INTENSITY, 1), FLOW_QUIET_INTENSITY, 1);
   }
 
   // Moves every grain one step along its track, and moves the noise on in
   // time. millis() means the ripples change at the same pace however fast
   // the computer draws frames.
   update() {
-    // Ease towards the month's density and speed, so a change of month
-    // fades in and out instead of jumping.
+    // Ease towards the month's density, speed and brightness, so a change
+    // of month fades in and out instead of jumping.
     this.visibleShare = lerp(this.visibleShare, this.targetVisibleShare, FLOW_DATA_EASING);
     this.speedScale = lerp(this.speedScale, this.targetSpeedScale, FLOW_DATA_EASING);
+    this.intensity = lerp(this.intensity, this.targetIntensity, FLOW_DATA_EASING);
 
     this.noiseTime = (millis() / 1000) * FLOW_NOISE_TIME_SPEED;
     let stepPixels = FLOW_BASE_SPEED_UNITS * this.gridUnit * this.speedScale;
@@ -321,19 +415,143 @@ class LineStream {
     }
   }
 
-  // Draws every grain in the given colour (a p5 color).
-  draw(lineColour) {
-    push();
-    noStroke();
-    fill(lineColour);
-    // Squares are drawn centred on the grain's position.
-    rectMode(CENTER);
+  // Draws the month's share of grains in the given colour (a p5 color),
+  // pushed by the pointer's press.
+  //
+  // Thousands of marks are drawn every frame, so instead of p5's square()
+  // and line() (which do extra work on every call) we draw straight onto
+  // the canvas. drawingContext is p5's handle on the browser's canvas 2D
+  // API; beginPath(), rect(), moveTo(), lineTo(), fill() and stroke() are
+  // that API's own drawing commands. All the knots are collected into one
+  // path and filled at once:
+  // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
+  draw(lineColour, press) {
+    // Locate every shown grain first (this also eases its press offset).
+    let shownCount = 0;
     for (let grain of this.grains) {
-      // Only the month's share of grains is shown (see showThreshold).
-      if (grain.showThreshold < this.visibleShare) {
-        grain.draw(this);
+      grain.isShown = grain.showThreshold < this.visibleShare && grain.locate(this, press);
+      if (grain.isShown) {
+        shownCount++;
       }
     }
+    if (shownCount === 0) {
+      return;
+    }
+
+    // The month's brightness fades the colour (on top of any fading for
+    // listening mode, which comes in with lineColour).
+    lineColour.setAlpha(alpha(lineColour) * this.intensity);
+
+    push();
+    let context = drawingContext;
+
+    // Knots: small squares centred on each grain.
+    noStroke();
+    fill(lineColour);
+    context.beginPath();
+    for (let grain of this.grains) {
+      if (grain.isShown && grain.isKnot) {
+        let size = grain.sizeUnits * this.gridUnit;
+        context.rect(grain.x - size / 2, grain.y - size / 2, size, size);
+      }
+    }
+    context.fill();
+
+    // Stitches: short dashes lying along the track, in two thicknesses.
+    // Square ends make them read as woven threads rather than dots.
+    noFill();
+    stroke(lineColour);
+    strokeCap(SQUARE);
+    this.drawStitches(false, this.thinStitchWeight);
+    this.drawStitches(true, this.thickStitchWeight);
     pop();
+  }
+
+  // Strokes every shown stitch of one thickness. Unlike the knots, each
+  // stitch is stroked on its own: in testing, one huge path of thousands of
+  // short strokes was slower for the browser to draw than many tiny ones.
+  drawStitches(isThick, weight) {
+    let context = drawingContext;
+    strokeWeight(weight);
+    for (let grain of this.grains) {
+      if (grain.isShown && !grain.isKnot && grain.isThickStitch === isThick) {
+        let halfLength = (grain.lengthUnits * this.gridUnit) / 2;
+        context.beginPath();
+        context.moveTo(grain.x - grain.tangentX * halfLength, grain.y - grain.tangentY * halfLength);
+        context.lineTo(grain.x + grain.tangentX * halfLength, grain.y + grain.tangentY * halfLength);
+        context.stroke();
+      }
+    }
+  }
+}
+
+// The dent the pointer makes when it presses into the threads, like a
+// finger pressing into fabric. Threads near the pointer are pushed out to
+// either side of it, across their own track, so the woven bundle parts and
+// bunches up around the pointer, then springs back when it leaves.
+//
+// The push uses the shape of the slope of a Gaussian (bell) curve:
+//   push = depth * a * exp(-(a*a + b*b) / 2)
+// where a is how far the grain is across the track from the pointer and b
+// how far along it (both measured in press widths). It is 0 right under
+// the pointer and far away, and strongest one width either side, so the
+// threads are moved aside smoothly without any sudden flip in direction.
+// The Gaussian falloff is a standard smoothing curve:
+// https://en.wikipedia.org/wiki/Gaussian_function
+//
+// The press only changes where grains are drawn. The tracks themselves
+// (TrackPath points) are never changed.
+class FabricPress {
+  constructor() {
+    // The dent's centre, which glides after the pointer.
+    this.x = 0;
+    this.y = 0;
+    // How deep the dent is now (0 = no dent), and how deep it is heading.
+    this.strength = 0;
+    this.targetStrength = 0;
+  }
+
+  // Called once a frame with the pointer's position, whether it is over
+  // the map, and whether the mouse button (or a finger) is held down.
+  update(pointerX, pointerY, isOverMap, isHeld) {
+    if (!isOverMap) {
+      this.targetStrength = 0;
+    } else if (isHeld) {
+      this.targetStrength = FLOW_PRESS_HELD_DEPTH;
+    } else {
+      this.targetStrength = FLOW_PRESS_HOVER_DEPTH;
+    }
+
+    // A new press starts right under the pointer; an existing one glides
+    // after it, so a fast flick of the mouse drags a soft wake.
+    if (this.strength < 0.02) {
+      this.x = pointerX;
+      this.y = pointerY;
+    } else {
+      this.x = lerp(this.x, pointerX, FLOW_PRESS_FOLLOW);
+      this.y = lerp(this.y, pointerY, FLOW_PRESS_FOLLOW);
+    }
+    this.strength = lerp(this.strength, this.targetStrength, FLOW_PRESS_EASING);
+  }
+
+  // How far (in pixels, along the track's normal) the press pushes a grain
+  // drawn at (x, y). Positive pushes towards the normal's side.
+  getPush(x, y, normalX, normalY, stream) {
+    if (this.strength < 0.001) {
+      return 0;
+    }
+    let pressWidth = FLOW_PRESS_WIDTH_UNITS * stream.gridUnit;
+    let offsetX = x - this.x;
+    let offsetY = y - this.y;
+    let reach = FLOW_PRESS_REACH * pressWidth;
+    if (abs(offsetX) > reach || abs(offsetY) > reach) {
+      return 0;
+    }
+
+    // Across the track (along the normal) and along it (along the
+    // tangent), in press widths.
+    let across = (offsetX * normalX + offsetY * normalY) / pressWidth;
+    let along = (offsetX * normalY - offsetY * normalX) / (FLOW_PRESS_LENGTH_UNITS * stream.gridUnit);
+    return this.strength * pressWidth * across * exp(-(across * across + along * along) / 2);
   }
 }
