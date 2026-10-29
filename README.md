@@ -9,9 +9,21 @@
 ## Inspiration
 
 - **Sonic Cloth** (NYU Shanghai IMA): a textile where touch, sound and fabric work as one connected system. We took that idea of a single shared material reacting to several inputs, not its visual style.
+
+  ![Sonic Cloth: touch and sound acting on one fabric, and in Commuter Loom a T1 thread pulled out of the network](docs/inspiration-sonic-cloth.png)
+
 - **The official Sydney Trains network map**: the composition of horizontal, vertical and 45° coloured lines running side by side.
+
+  ![The Sydney Trains map: coloured lines side by side at 0, 45 and 90 degrees, and in Commuter Loom the lines around the CBD loop](docs/inspiration-network-map.png)
+
 - **Jon Reades, *A Week in the Life of London Underground*** (UCL Centre for Advanced Spatial Analysis, 2012): a visualisation of more than 27 million Oyster card taps over one week, in which the city visibly beats with its morning and evening peaks. Reades describes it as showing "the pulse of the city" ([UCL News, 2012](https://www.ucl.ac.uk/news/headlines/2012/jul/underground-movement)). Our tutor suggested it as a reference: <https://www.informationisbeautifulawards.com/showcase/89-a-week-in-the-life-of-london-underground> Our data is monthly rather than per tap, so instead of a daily heartbeat we show ten years of rhythm in our own textile language: the network's breathing and how dense its threads are.
+
+  ![A week of Oyster taps with weekday peaks, and in Commuter Loom the ten-year trace and breathing monitor](docs/inspiration-week-in-the-life.png)
+
 - **Connected-particle artworks**: dense fields of fine grains where density and flow speed can be read at a glance.
+
+  ![A field of connected particles, and in Commuter Loom the dense T1 and T5 bands of grains](docs/inspiration-particles.png)
+
 
 ## The data
 
