@@ -128,7 +128,7 @@ function draw() {
   // pulls it out instead (InputControls), so the dent lifts while either
   // is happening.
   let isParting = inputControls.handIsActive && !inputControls.handIsGathering && !inputControls.isPulling;
-  fabricPress.update(mouseX, mouseY, isParting, false);
+  fabricPress.update(mouseX, mouseY, isParting);
 
   // 2. Move and draw the grains, line by line. The line in listening mode
   // is drawn last so it sits on top.

@@ -218,12 +218,10 @@ const FLOW_PRESS_WIDTH_UNITS = 1.0;
 const FLOW_PRESS_LENGTH_UNITS = 1.5;
 
 // How hard the press pushes, as a multiple of FLOW_PRESS_WIDTH_UNITS.
-// Hovering presses lightly; holding the mouse button (or a finger) down
-// presses deeper. Keeping the deep press below 2.2 means threads are
-// squeezed together but never pushed past each other, so the bundle keeps
-// its order.
-const FLOW_PRESS_HOVER_DEPTH = 1.3;
-const FLOW_PRESS_HELD_DEPTH = 2.0;
+// Keeping it below 2.2 means threads are squeezed together but never
+// pushed past each other, so the bundle keeps its order. (Holding the
+// mouse button gathers the threads instead: see InputControls.)
+const FLOW_PRESS_DEPTH = 1.3;
 
 // Beyond this many widths the dent is too faint to matter, so grains
 // further away skip the maths.
@@ -688,15 +686,13 @@ class FabricPress {
     this.targetStrength = 0;
   }
 
-  // Called once a frame with the pointer's position, whether it is over
-  // the map, and whether the mouse button (or a finger) is held down.
-  update(pointerX, pointerY, isOverMap, isHeld) {
-    if (!isOverMap) {
-      this.targetStrength = 0;
-    } else if (isHeld) {
-      this.targetStrength = FLOW_PRESS_HELD_DEPTH;
+  // Called once a frame with the pointer's position and whether it is
+  // parting the threads (over the map, and not gathering or pulling).
+  update(pointerX, pointerY, isParting) {
+    if (isParting) {
+      this.targetStrength = FLOW_PRESS_DEPTH;
     } else {
-      this.targetStrength = FLOW_PRESS_HOVER_DEPTH;
+      this.targetStrength = 0;
     }
 
     // A new press starts right under the pointer; an existing one glides

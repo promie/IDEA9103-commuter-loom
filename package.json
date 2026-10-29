@@ -1,0 +1,9 @@
+{
+  "name": "commuter-loom",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Commuter Loom: Collective Movement Memory, a data-driven p5.js artwork (IDEA9103)",
+  "scripts": {
+    "check": "for f in sketch.js utils/*.js mechanics/*.js; do node --check \"$f\" || exit 1; done"
+  }
+}
