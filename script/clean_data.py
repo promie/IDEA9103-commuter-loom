@@ -1,4 +1,10 @@
-"""Create the full Commuter Loom dataset from raw Transport for NSW Opal trip data."""
+"""Create the full Commuter Loom dataset from raw Transport for NSW Opal trip data.
+
+AI acknowledgement: this script was written with the help of Claude
+(Anthropic). It reads data/train.csv, turns dates into YYYY-MM, keeps only
+the T1-T9 line families, adds up every card type, and writes one row per
+month and line to data/monthly_line_trips_full.csv.
+"""
 
 import csv
 from collections import defaultdict

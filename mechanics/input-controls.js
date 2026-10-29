@@ -140,7 +140,8 @@ class InputControls {
 
   // How much of the pull a grain feels, from 0 to 1. Grains right where the
   // line was grabbed move the full distance; further along the track they
-  // move less, so the line bends like a pulled thread.
+  // move less, so the line bends like a pulled thread. The falloff is a
+  // Gaussian (bell) curve: https://en.wikipedia.org/wiki/Gaussian_function
   getPullWeight(grain) {
     if (!this.isPulling || grain.path.lineName !== this.pulledLineName) {
       return 0;

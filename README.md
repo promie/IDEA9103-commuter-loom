@@ -133,7 +133,8 @@ All three of us used Claude (Anthropic) while building this project. Every file 
 
 - **Promie**: Claude helped plan the object-oriented structure and the station grid, and helped write the shared classes in `utils/`, `mechanics/input-controls.js`, the data-cleaning script, and the code that connects the three mechanics in `sketch.js`.
 - **Wanghao**: Claude (an AI assistant in Cursor) helped plan and write `mechanics/perlin-flow.js` and its hook-up in `sketch.js` and `index.html`. That covers the grain classes, the noise-drift limit, the data mapping and the Gaussian press. Each step was reviewed and tested in the browser, and how the code works is explained in comments in the file.
-- **Guangshun**: Claude helped write `mechanics/audio-reactive.js` (the layered mix, the FFT analysis and the mute button) and `script/generate_city_sound.py`, which generates the three city-sound layers and the clack (run it with `python3 script/generate_city_sound.py`).
+- **Guangshun**: Claude helped write `mechanics/audio-reactive.js` (the layered mix, the FFT analysis and the mute button), `utils/fabric-breath.js` (the breathing deepened by the sound level) and `script/generate_city_sound.py`, which generates the three city-sound layers and the clack (run it with `python3 script/generate_city_sound.py`).
+- **README graphics**: the diagrams, illustrations and animated GIFs in `docs/` were made with Claude's help, from the project's own code and data. Each one has an HTML source file in `docs/` next to its image.
 
 ## External references
 
