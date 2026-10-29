@@ -80,7 +80,167 @@ canvas {
   transition: transform 0.25s ease;
 }
 
+/* The round sound and play buttons beside the theme switch (made in
+   utils/playback-controls.js and placed by sketch.js). */
+#sound-control {
+  width: 40px;
+  height: 40px;
+}
+
+#sound-control svg {
+  width: 18px;
+  height: 18px;
+}
+
+#play-control {
+  width: 48px;
+  height: 48px;
+  border: none;
+}
+
+#play-control svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* ---------- The page header (utils/page-header.js) ---------- */
+
+/* Text over the canvas. pointer-events: none lets the mouse reach the
+   artwork underneath. */
+.page-header {
+  position: fixed;
+  top: 18px;
+  z-index: 5;
+  pointer-events: none;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  color: #a3a9b8;
+}
+
+.page-header p {
+  margin: 0;
+}
+
+#page-title-block {
+  left: 24px;
+  max-width: 46vw;
+}
+
+#page-about-block {
+  right: 24px;
+  max-width: 34vw;
+  text-align: right;
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.page-logo {
+  width: 30px;
+  height: 30px;
+  flex: none;
+}
+
+.page-title h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #f2efe6;
+}
+
+.page-status {
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.page-keys {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.page-range {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #e8a75e;
+}
+
+.page-header .page-subtitle {
+  margin: 3px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #f2efe6;
+}
+
+.page-note {
+  font-size: 10px;
+}
+
+/* Small screens: a smaller title, and the right-hand note and keyboard
+   hints left out so the header stays clear of the map. */
+@media (max-width: 640px) {
+  #page-title-block {
+    left: 16px;
+    max-width: calc(100vw - 32px);
+  }
+
+  /* The years move under the title on the left, out of the title's way. */
+  #page-about-block {
+    top: 80px;
+    right: auto;
+    left: 16px;
+    text-align: left;
+  }
+
+  .page-title {
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .page-title h1 {
+    font-size: 17px;
+    white-space: nowrap;
+  }
+
+  .page-status {
+    font-size: 10px;
+  }
+
+  .page-range {
+    white-space: nowrap;
+  }
+
+  .page-logo {
+    width: 24px;
+    height: 24px;
+  }
+
+  .page-keys,
+  .page-note,
+  .page-subtitle {
+    display: none;
+  }
+}
+
 /* ---------- Dark theme (default) ---------- */
+
+#sound-control,
+#theme-control {
+  border: 1px solid rgba(242, 239, 230, 0.6);
+  background: rgba(14, 17, 26, 0.6);
+  color: #f2efe6;
+}
+
+#play-control {
+  background: #e8a75e;
+  color: #0e111a;
+}
 
 #theme-control {
   border: 1px solid rgba(242, 239, 230, 0.6);
@@ -106,9 +266,14 @@ canvas {
 /* Hover effects only on devices with a real mouse. On phones a tapped
    button would otherwise stay in its hover colour until you tap elsewhere. */
 @media (hover: hover) {
+  #sound-control:hover,
   #theme-control:hover {
     border-color: #f2efe6;
     background: rgba(242, 239, 230, 0.12);
+  }
+
+  #play-control:hover {
+    background: #f2bb78;
   }
 }
 
@@ -119,10 +284,29 @@ body.light {
   background: #f8f5ec;
 }
 
+body.light #sound-control,
 body.light #theme-control {
   border-color: rgba(23, 26, 34, 0.6);
   background: rgba(248, 245, 236, 0.6);
   color: #171a22;
+}
+
+body.light #play-control {
+  background: #c6782b;
+  color: #f8f5ec;
+}
+
+body.light .page-header {
+  color: #596171;
+}
+
+body.light .page-title h1,
+body.light .page-subtitle {
+  color: #171a22;
+}
+
+body.light .page-range {
+  color: #c6782b;
 }
 
 /* Light theme: the knob slides left onto the sun. */
@@ -144,8 +328,13 @@ body.light .commuter-control:focus-visible {
 }
 
 @media (hover: hover) {
+  body.light #sound-control:hover,
   body.light #theme-control:hover {
     border-color: #171a22;
     background: rgba(23, 26, 34, 0.08);
+  }
+
+  body.light #play-control:hover {
+    background: #d98b3d;
   }
 }
