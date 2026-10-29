@@ -123,7 +123,12 @@ function draw() {
   audioReactive.followData(fabricBreath.getBusyness());
   dataPanel.update(timeline.monthIndex, inputControls.selectedLineName, fabricBreath);
   inputControls.update();
-  fabricPress.update(mouseX, mouseY, inputControls.handIsActive, inputControls.handIsGathering);
+  // Hovering presses a soft dent into the threads (Wanghao's FabricPress).
+  // Holding the mouse gathers the threads into the hand and dragging a line
+  // pulls it out instead (InputControls), so the dent lifts while either
+  // is happening.
+  let isParting = inputControls.handIsActive && !inputControls.handIsGathering && !inputControls.isPulling;
+  fabricPress.update(mouseX, mouseY, isParting, false);
 
   // 2. Move and draw the grains, line by line. The line in listening mode
   // is drawn last so it sits on top.
@@ -166,12 +171,13 @@ function fillStreams() {
 
 // Moves and draws every line's grains, with the density, speed and
 // brightness of the month shown. The frame object carries what the grains
-// react to: the pointer's press, the month's pulse, the network's breath
-// and the city sound. In listening mode the selected line is drawn last
+// react to: the pointer's press, the visitor's hand, the month's pulse,
+// the network's breath and the city sound. In listening mode the selected line is drawn last
 // (on top).
 function drawStreams(selectedLineName) {
   let frame = {
     press: fabricPress,
+    input: inputControls,
     pulse: timeline.pulse,
     breathSwell: fabricBreath.getSwell(),
     audio: audioReactive,

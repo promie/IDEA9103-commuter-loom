@@ -296,6 +296,32 @@ class RailNetwork {
     return nearest;
   }
 
+  // Where along each of a line's branches the mouse grabbed it, as a list
+  // with one entry per branch. Branches that pass nowhere near the mouse get
+  // -1, so pulling T1 at Parramatta doesn't also tug T1 on the North Shore.
+  findGrabbedDistances(lineName, x, y) {
+    let branchCount = this.getPathsFor(lineName).length;
+    let grabbedDistances = [];
+    let closestDistances = [];
+    for (let i = 0; i < branchCount; i++) {
+      grabbedDistances.push(-1);
+      closestDistances.push(LINE_HIT_DISTANCE * 3);
+    }
+
+    for (let hitPoint of this.hitPoints) {
+      if (hitPoint.path.lineName !== lineName) {
+        continue;
+      }
+      let branchIndex = hitPoint.path.branchIndex;
+      let distanceToMouse = dist(x, y, hitPoint.x, hitPoint.y);
+      if (distanceToMouse < closestDistances[branchIndex]) {
+        closestDistances[branchIndex] = distanceToMouse;
+        grabbedDistances[branchIndex] = hitPoint.distance;
+      }
+    }
+    return grabbedDistances;
+  }
+
   // Is (x, y) in the part of the screen clear of the header and timeline?
   isInLabelArea(x, y) {
     let onScreen = x > 26 && x < width - 26 && y > 150 && y < this.mapBottom - 24;

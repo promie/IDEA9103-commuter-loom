@@ -44,6 +44,13 @@
 // shear neighbouring lines sideways against each other, and treble makes
 // the grains shiver. The line being listened to reacts most strongly.
 //
+// The visitor's hand (mechanics/input-controls.js) reaches the grains
+// through frame.input: holding the mouse gathers grains into the hand,
+// dragging a line pulls it out of the network, and the flow speeds up
+// near the hand. A spring then eases each grain back onto its track. The
+// spring is the spring force from Daniel Shiffman's "The Nature of Code",
+// chapter 3: https://natureofcode.com/oscillation/#spring-forces
+//
 // Sizes, spacing and speeds are measured in grid units (railNetwork.gridUnit)
 // instead of pixels, so the textile looks the same on a phone and on a big
 // screen.
@@ -189,6 +196,19 @@ const FLOW_BASS_SQUEEZE = 0.6;
 const FLOW_SHEAR_RIPPLE = 0.012;
 const FLOW_SHEAR_SPEED = 3;
 
+// ---- The hand ----
+
+// The spring that pulls a grain back onto its track after the hand has
+// moved it: how strongly it pulls (stronger while a line is being dragged
+// out, so the thread follows the hand closely) and how much of the speed
+// is kept each frame (below 1, so it settles instead of bouncing forever).
+const FLOW_SPRING_STIFFNESS = 0.045;
+const FLOW_PULL_STIFFNESS = 0.12;
+const FLOW_SPRING_DAMPING = 0.84;
+
+// How much faster grains flow right under the hand (1.5 = 150% faster).
+const FLOW_HAND_STIR = 1.5;
+
 // ---- Pointer press ----
 
 // The dent's size, in grid units: how far it reaches across the track
@@ -254,6 +274,13 @@ class Grain {
     // It eases towards the press (see locate()), so it springs back softly.
     this.pressOffset = 0;
 
+    // How far the hand has moved it off its track, in pixels, and how fast
+    // that is changing. The spring brings both back to 0 (see locate()).
+    this.offsetX = 0;
+    this.offsetY = 0;
+    this.velocityX = 0;
+    this.velocityY = 0;
+
     // Whether it is drawn this frame, and where, filled in by locate().
     this.isShown = false;
     this.x = 0;
@@ -304,7 +331,7 @@ class Grain {
   // this.y and this.tangentX/Y (the direction of the track). Returns false
   // if the grain is off the screen. stream.position is an object shared by
   // every grain in the stream, so no new object is made each frame.
-  locate(stream, press) {
+  locate(stream, press, input) {
     let position = stream.position;
     this.path.getPositionAt(this.distance, this.segmentIndex, position);
     let normalX = position.normalX;
@@ -330,6 +357,26 @@ class Grain {
     this.pressOffset = lerp(this.pressOffset, pressTarget, FLOW_GRAIN_SPRING);
     x += normalX * this.pressOffset;
     y += normalY * this.pressOffset;
+
+    // Then by the hand. The spring pulls the grain towards its target
+    // offset: 0 (back onto its track), or the pulled shape while its line
+    // is being dragged out. Holding the mouse gathers it into the hand.
+    let pullWeight = input.getPullWeight(this);
+    let targetX = input.pullOffsetX * pullWeight;
+    let targetY = input.pullOffsetY * pullWeight;
+    let stiffness = FLOW_SPRING_STIFFNESS;
+    if (pullWeight > 0) {
+      stiffness = FLOW_PULL_STIFFNESS;
+    }
+    this.velocityX += (targetX - this.offsetX) * stiffness;
+    this.velocityY += (targetY - this.offsetY) * stiffness;
+    input.applyGather(this, x, y);
+    this.velocityX *= FLOW_SPRING_DAMPING;
+    this.velocityY *= FLOW_SPRING_DAMPING;
+    this.offsetX += this.velocityX;
+    this.offsetY += this.velocityY;
+    x += this.offsetX;
+    y += this.offsetY;
 
     // Parts of some lines (Emu Plains, Berowra...) run off the screen.
     let margin = stream.gridUnit * FLOW_MAX_STITCH_LENGTH_UNITS * FLOW_MAX_SPEED_FACTOR;
@@ -505,8 +552,9 @@ class LineStream {
   // time. millis() means the ripples change at the same pace however fast
   // the computer draws frames. frame comes from sketch.js: frame.pulse
   // (0-1) is the month change, frame.breathSwell the network's breath
-  // (about -0.6 to 0.6), frame.audio the AudioReactive object and
-  // frame.time a clock that moves on 0.01 each frame.
+  // (about -0.6 to 0.6), frame.audio the AudioReactive object,
+  // frame.input the InputControls object and frame.time a clock that moves
+  // on 0.01 each frame.
   update(frame) {
     // Ease towards the month's density, speed and brightness, so a change
     // of month fades in and out instead of jumping.
@@ -536,12 +584,15 @@ class LineStream {
     // Hidden grains keep moving too, so when a busier month brings them
     // back they are already spread along the track.
     for (let grain of this.grains) {
-      grain.move(stepPixels);
+      // The flow speeds up near the hand, like stirring a current.
+      let stir = frame.input.getTouchAmount(grain.x, grain.y) * FLOW_HAND_STIR;
+      grain.move(stepPixels * (1 + stir));
     }
   }
 
   // Draws the month's share of grains in the given colour (a p5 color),
-  // pushed by the pointer's press (frame.press).
+  // pushed by the pointer's press (frame.press) and moved by the hand
+  // (frame.input).
   //
   // Thousands of marks are drawn every frame, so instead of p5's square()
   // and line() (which do extra work on every call) we draw straight onto
@@ -555,7 +606,7 @@ class LineStream {
     // Locate every shown grain first (this also eases its press offset).
     let shownCount = 0;
     for (let grain of this.grains) {
-      grain.isShown = grain.showThreshold < this.visibleShare && grain.locate(this, press);
+      grain.isShown = grain.showThreshold < this.visibleShare && grain.locate(this, press, frame.input);
       if (grain.isShown) {
         shownCount++;
       }
