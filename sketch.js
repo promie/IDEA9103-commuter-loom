@@ -6,7 +6,8 @@
 // object for each part of the artwork, and calls them every frame. The
 // actual work happens in the classes:
 //   utils/      ColourTheme, TripData, RailNetwork + TrackPath
-//   mechanics/  InputControls (user input)
+//   mechanics/  LineStream + Grain (Perlin noise and randomness),
+//               InputControls (user input)
 
 // Monthly Opal trips for each Sydney Trains line, made from the raw
 // Transport for NSW data (data/train.csv) by script/clean_data.py.
@@ -22,6 +23,11 @@ let theme;
 let tripData;
 let railNetwork;
 let inputControls;
+// One stream of grains per line (mechanics/perlin-flow.js).
+let lineStreams = [];
+
+// Fallback: set to true to draw the old solid tracks instead of the grains.
+const SHOW_SOLID_TRACKS = false;
 
 // Heavy files are loaded before setup() runs, so they are ready to use.
 function preload() {
@@ -39,6 +45,11 @@ function setup() {
   railNetwork = new RailNetwork(STATIONS, LINE_ROUTES, LANE_ORDER, theme);
   fitMap();
 
+  for (let lineName of LINE_NAMES) {
+    lineStreams.push(new LineStream(lineName));
+  }
+  fillStreams();
+
   inputControls = new InputControls(railNetwork);
 
   // Buttons respond to a mouse press, or to a finger lifting on a touch
@@ -51,7 +62,11 @@ function setup() {
 function draw() {
   background(theme.getBackground(255));
   railNetwork.drawTrackGuides();
-  drawTracks(inputControls.selectedLineName);
+  if (SHOW_SOLID_TRACKS) {
+    drawTracks(inputControls.selectedLineName);
+  } else {
+    drawStreams(inputControls.selectedLineName);
+  }
 
   // Labels on top. In listening mode, the other lines' badges fade back.
   railNetwork.drawStationLabels();
@@ -79,9 +94,38 @@ function toggleTheme() {
   theme.toggle();
 }
 
-// Temporary: each track drawn as a solid line in its line's colour,
-// thicker for busier lines, to check the side-by-side bundles and the
-// rounded corners. Replaced by the particle streams later.
+// Gives every line's stream its grains, on the tracks just built.
+function fillStreams() {
+  for (let stream of lineStreams) {
+    stream.fillWithGrains(railNetwork.getPathsFor(stream.lineName), railNetwork.gridUnit);
+  }
+}
+
+// Moves and draws every line's grains. In listening mode the selected
+// line is drawn last (on top) and the others fade back, as the solid
+// tracks below did.
+function drawStreams(selectedLineName) {
+  let selectedStream = null;
+  for (let stream of lineStreams) {
+    stream.update();
+    if (stream.lineName === selectedLineName) {
+      selectedStream = stream;
+    } else {
+      let lineColour = color(theme.getLineColour(stream.lineName));
+      if (selectedLineName !== null) {
+        lineColour.setAlpha(60);
+      }
+      stream.draw(lineColour);
+    }
+  }
+  if (selectedStream !== null) {
+    selectedStream.draw(color(theme.getLineColour(selectedStream.lineName)));
+  }
+}
+
+// Fallback (see SHOW_SOLID_TRACKS): each track drawn as a solid line in
+// its line's colour, thicker for busier lines. The grain streams in
+// drawStreams() replace it.
 // In listening mode the selected line is drawn last (on top) and the
 // others fade back.
 function drawTracks(selectedLineName) {
@@ -146,10 +190,12 @@ function keyPressed() {
   inputControls.handleKeyPressed();
 }
 
-// Keep the artwork filling the window: rebuild the tracks for the new size
-// and move the controls to the new bottom edge.
+// Keep the artwork filling the window: rebuild the tracks for the new size,
+// refill each line with grains on the new tracks, and move the controls to
+// the new bottom edge.
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
   fitMap();
+  fillStreams();
   positionControls();
 }
