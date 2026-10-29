@@ -2,9 +2,22 @@
 
 *Commuter Loom: Collective Movement Memory* is an original, data-driven p5.js artwork (Option 2 of the IDEA9103 Creative Coding Major Project). Sydney's rail network becomes a living textile: every T1–T9 line is a stream of coloured grains flowing along a schematic map, and ten years of monthly Opal trips decide how dense and fast each stream is. Touch, noise and sound all act on the same grains, and the whole network breathes and tightens with the data.
 
+## Preview
+
+![Commuter Loom playing from late 2019 into the 2020 lockdowns: a line is pulled out and springs back, T4 is selected for listening mode, and the threads gather into the hand](docs/preview.gif)
+
+## Run it
+
 **Live site:** <https://commuter-loom.pyutasane.com>
 
-Run it locally through a local server, for example `python3 -m http.server` inside this folder, then open the printed address. (Opening `index.html` directly does not work, because browsers block loading the CSV and sound files from disk.)
+To run it locally, you need [Node.js](https://nodejs.org/). Inside this folder:
+
+```bash
+npm i          # install live-server (once)
+npm run dev    # serve the site and open it at http://127.0.0.1:8080
+```
+
+The page reloads by itself whenever you save a file. (Opening `index.html` directly does not work, because browsers block loading the CSV and sound files from disk.)
 
 ## Interaction instructions
 
@@ -172,6 +185,7 @@ All three of us used Claude (Anthropic) while building this project. Every file 
 ## Development
 
 ```bash
+npm run dev          # local server with live reload
 npm run check        # syntax-check every JavaScript file with node --check
 npm run clean-data   # rebuild data/monthly_line_trips_full.csv from data/train.csv
 npm run deploy       # check, upload to S3 (no-cache, so browsers always fetch the latest files), then clear the CloudFront cache
