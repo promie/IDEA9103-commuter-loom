@@ -59,6 +59,9 @@ function preload() {
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  // Sharp on high-resolution screens, but never more than 2x, to keep
+  // thousands of grains running smoothly.
+  pixelDensity(min(2, displayDensity()));
   // Raleway is loaded by style.css from assets/fonts.
   textFont("Raleway");
 
@@ -102,6 +105,7 @@ function setup() {
 
 function draw() {
   background(theme.getBackground(255));
+  checkPerformance();
 
   // 1. Update the mechanics that every grain reads from. The month's data
   // sets the sound and the breathing; the sound's loudness deepens the
@@ -121,7 +125,8 @@ function draw() {
   inputControls.update();
   fabricPress.update(mouseX, mouseY, inputControls.handIsActive, inputControls.handIsGathering);
 
-  // 2. Move and draw the grains, line by line.
+  // 2. Move and draw the grains, line by line. The line in listening mode
+  // is drawn last so it sits on top.
   // Everything on the map is clipped to the map's area (above the control
   // dock, and above the data card on phones), so the train lines end
   // exactly there and nothing shows behind the controls. beginClip() and
@@ -160,25 +165,38 @@ function fillStreams() {
 }
 
 // Moves and draws every line's grains, with the density, speed and
-// brightness of the month shown, pressed by the pointer. In listening mode
-// the selected line is drawn last (on top) and the others fade back.
+// brightness of the month shown. The frame object carries what the grains
+// react to: the pointer's press, the month's pulse and the network's
+// breath. In listening mode the selected line is drawn last (on top).
 function drawStreams(selectedLineName) {
+  let frame = {
+    press: fabricPress,
+    pulse: timeline.pulse,
+    breathSwell: fabricBreath.getSwell(),
+  };
   let selectedStream = null;
   for (let stream of lineStreams) {
     stream.setMonth(timeline.monthIndex);
-    stream.update();
+    stream.setListening(selectedLineName);
+    stream.update(frame);
     if (stream.lineName === selectedLineName) {
       selectedStream = stream;
     } else {
-      let lineColour = color(theme.getLineColour(stream.lineName));
-      if (selectedLineName !== null) {
-        lineColour.setAlpha(60);
-      }
-      stream.draw(lineColour, fabricPress);
+      stream.draw(color(theme.getLineColour(stream.lineName)), frame);
     }
   }
   if (selectedStream !== null) {
-    selectedStream.draw(color(theme.getLineColour(selectedStream.lineName)), fabricPress);
+    selectedStream.draw(color(theme.getLineColour(selectedStream.lineName)), frame);
+  }
+}
+
+// Some devices (older phones and tablets) struggle to draw thousands of
+// grains on a high-resolution screen. About 3 seconds in, if the frame rate
+// has dropped below 40 frames per second, we draw at standard resolution
+// instead, which is much less work. This only happens once.
+function checkPerformance() {
+  if (frameCount === 180 && frameRate() < 40 && pixelDensity() > 1) {
+    pixelDensity(1);
   }
 }
 

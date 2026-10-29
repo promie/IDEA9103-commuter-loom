@@ -33,6 +33,12 @@
 // sets each grain's character, noise() sets how it sways, and the
 // FabricPress adds a temporary dent on top where the pointer presses.
 //
+// The rest of the artwork reaches the grains through a "frame" object that
+// sketch.js passes in every frame: the month's pulse (grains swell as a new
+// month is woven in) and the network's breath (the bands widen, surge and
+// settle together). In listening mode the selected line widens and speeds
+// up while the others narrow, slow and fade back.
+//
 // Sizes, spacing and speeds are measured in grid units (railNetwork.gridUnit)
 // instead of pixels, so the textile looks the same on a phone and on a big
 // screen.
@@ -141,6 +147,27 @@ const FLOW_QUIET_INTENSITY = 0.45;
 // share of the remaining difference covered each frame). Small numbers
 // mean grains appear and disappear gradually over about a second.
 const FLOW_DATA_EASING = 0.05;
+
+// ---- Listening mode, month pulse and breathing ----
+
+// In listening mode the selected line's band widens and its grains speed
+// up; every other line narrows, slows and fades back.
+const FLOW_SELECTED_WIDTH = 1.9;
+const FLOW_SELECTED_SPEED = 1.5;
+const FLOW_FADED_WIDTH = 0.55;
+const FLOW_FADED_SPEED = 0.45;
+const FLOW_FADED_OPACITY = 0.22;
+
+// How quickly a line eases into and out of listening mode.
+const FLOW_FOCUS_EASING = 0.06;
+
+// How much bigger grains get at the peak of a month's pulse (0.6 = 60%).
+const FLOW_PULSE_GROWTH = 0.6;
+
+// At the top of a breath, how much faster grains flow (0.5 = 50%) and how
+// much bigger they get (0.35 = 35%). The band also widens with the breath.
+const FLOW_BREATH_SURGE = 0.5;
+const FLOW_BREATH_GROWTH = 0.35;
 
 // ---- Pointer press ----
 
@@ -266,7 +293,7 @@ class Grain {
     // Step sideways from the track centre along the normal (the direction
     // pointing across the track): first to the grain's own fixed place in
     // the band, then by the Perlin noise drift.
-    let sideways = this.laneOffset * stream.bandHalfWidth + this.getDrift(stream);
+    let sideways = this.laneOffset * stream.currentBandHalfWidth + this.getDrift(stream);
     let x = position.x + normalX * sideways;
     let y = position.y + normalY * sideways;
 
@@ -326,6 +353,21 @@ class LineStream {
     this.maxDrift = 0;
     this.thinStitchWeight = 1;
     this.thickStitchWeight = 1;
+
+    // Listening mode, eased so a line comes forward or fades back gently:
+    // how wide its band is, how fast it flows and how visible it is.
+    this.focusWidth = 1;
+    this.focusSpeed = 1;
+    this.focusOpacity = 1;
+    this.targetFocusWidth = 1;
+    this.targetFocusSpeed = 1;
+    this.targetFocusOpacity = 1;
+
+    // Set each frame in update(): the band's half width after listening
+    // mode and the breath, and how much the month's pulse and the breath
+    // enlarge every grain.
+    this.currentBandHalfWidth = 0;
+    this.sizeBoost = 1;
 
     // Where this line's ripples start in the noise, chosen at random once,
     // so every line swings in its own pattern instead of all in step.
@@ -396,18 +438,44 @@ class LineStream {
     this.targetIntensity = constrain(map(tripRatio, 0, 1, FLOW_QUIET_INTENSITY, 1), FLOW_QUIET_INTENSITY, 1);
   }
 
+  // Listening mode: selectedLineName is the line being listened to, or null.
+  setListening(selectedLineName) {
+    this.targetFocusWidth = 1;
+    this.targetFocusSpeed = 1;
+    this.targetFocusOpacity = 1;
+    if (selectedLineName === this.lineName) {
+      this.targetFocusWidth = FLOW_SELECTED_WIDTH;
+      this.targetFocusSpeed = FLOW_SELECTED_SPEED;
+    } else if (selectedLineName !== null) {
+      this.targetFocusWidth = FLOW_FADED_WIDTH;
+      this.targetFocusSpeed = FLOW_FADED_SPEED;
+      this.targetFocusOpacity = FLOW_FADED_OPACITY;
+    }
+  }
+
   // Moves every grain one step along its track, and moves the noise on in
   // time. millis() means the ripples change at the same pace however fast
-  // the computer draws frames.
-  update() {
+  // the computer draws frames. frame comes from sketch.js: frame.pulse
+  // (0-1) is the month change, frame.breathSwell the network's breath
+  // (about -0.6 to 0.6).
+  update(frame) {
     // Ease towards the month's density, speed and brightness, so a change
     // of month fades in and out instead of jumping.
     this.visibleShare = lerp(this.visibleShare, this.targetVisibleShare, FLOW_DATA_EASING);
     this.speedScale = lerp(this.speedScale, this.targetSpeedScale, FLOW_DATA_EASING);
     this.intensity = lerp(this.intensity, this.targetIntensity, FLOW_DATA_EASING);
+    this.focusWidth = lerp(this.focusWidth, this.targetFocusWidth, FLOW_FOCUS_EASING);
+    this.focusSpeed = lerp(this.focusSpeed, this.targetFocusSpeed, FLOW_FOCUS_EASING);
+    this.focusOpacity = lerp(this.focusOpacity, this.targetFocusOpacity, FLOW_FOCUS_EASING);
+
+    // The breath widens the band and surges the flow; the pulse and the
+    // breath both enlarge the grains.
+    this.currentBandHalfWidth = this.bandHalfWidth * this.focusWidth * (1 + frame.breathSwell);
+    this.sizeBoost = (1 + frame.pulse * FLOW_PULSE_GROWTH) * (1 + frame.breathSwell * FLOW_BREATH_GROWTH);
 
     this.noiseTime = (millis() / 1000) * FLOW_NOISE_TIME_SPEED;
-    let stepPixels = FLOW_BASE_SPEED_UNITS * this.gridUnit * this.speedScale;
+    let stepPixels = FLOW_BASE_SPEED_UNITS * this.gridUnit * this.speedScale * this.focusSpeed;
+    stepPixels = stepPixels * (1 + frame.breathSwell * FLOW_BREATH_SURGE);
     // Hidden grains keep moving too, so when a busier month brings them
     // back they are already spread along the track.
     for (let grain of this.grains) {
@@ -416,7 +484,7 @@ class LineStream {
   }
 
   // Draws the month's share of grains in the given colour (a p5 color),
-  // pushed by the pointer's press.
+  // pushed by the pointer's press (frame.press).
   //
   // Thousands of marks are drawn every frame, so instead of p5's square()
   // and line() (which do extra work on every call) we draw straight onto
@@ -425,7 +493,8 @@ class LineStream {
   // that API's own drawing commands. All the knots are collected into one
   // path and filled at once:
   // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
-  draw(lineColour, press) {
+  draw(lineColour, frame) {
+    let press = frame.press;
     // Locate every shown grain first (this also eases its press offset).
     let shownCount = 0;
     for (let grain of this.grains) {
@@ -438,9 +507,9 @@ class LineStream {
       return;
     }
 
-    // The month's brightness fades the colour (on top of any fading for
-    // listening mode, which comes in with lineColour).
-    lineColour.setAlpha(alpha(lineColour) * this.intensity);
+    // The month's brightness fades the colour, and listening mode fades
+    // every line except the selected one.
+    lineColour.setAlpha(alpha(lineColour) * this.intensity * this.focusOpacity);
 
     push();
     let context = drawingContext;
@@ -451,7 +520,7 @@ class LineStream {
     context.beginPath();
     for (let grain of this.grains) {
       if (grain.isShown && grain.isKnot) {
-        let size = grain.sizeUnits * this.gridUnit;
+        let size = grain.sizeUnits * this.gridUnit * this.sizeBoost;
         context.rect(grain.x - size / 2, grain.y - size / 2, size, size);
       }
     }
@@ -462,8 +531,8 @@ class LineStream {
     noFill();
     stroke(lineColour);
     strokeCap(SQUARE);
-    this.drawStitches(false, this.thinStitchWeight);
-    this.drawStitches(true, this.thickStitchWeight);
+    this.drawStitches(false, this.thinStitchWeight * this.sizeBoost);
+    this.drawStitches(true, this.thickStitchWeight * this.sizeBoost);
     pop();
   }
 
@@ -475,7 +544,7 @@ class LineStream {
     strokeWeight(weight);
     for (let grain of this.grains) {
       if (grain.isShown && !grain.isKnot && grain.isThickStitch === isThick) {
-        let halfLength = (grain.lengthUnits * this.gridUnit) / 2;
+        let halfLength = (grain.lengthUnits * this.gridUnit * this.sizeBoost) / 2;
         context.beginPath();
         context.moveTo(grain.x - grain.tangentX * halfLength, grain.y - grain.tangentY * halfLength);
         context.lineTo(grain.x + grain.tangentX * halfLength, grain.y + grain.tangentY * halfLength);
