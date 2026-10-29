@@ -22,6 +22,8 @@ Both datasets are from Transport for NSW Open Data:
 
 `script/clean_data.py` turns the raw CSV into `data/monthly_line_trips_full.csv`. It standardises dates to `YYYY-MM`, adds up all card types, and groups historical service names into T1–T9. Run it with `python3 script/clean_data.py`.
 
+![How script/clean_data.py cleans the data: T1 in November 2017 goes from 36 raw rows (4 historical line names × 9 card types) to one row of 12,583,123 trips](docs/data-cleaning.gif)
+
 How the data drives the artwork:
 
 ```text
@@ -35,23 +37,7 @@ Network this month      -> depth and speed of the breathing, and the sound mix:
 
 ## How to interact
 
-| Do this | What happens |
-|---|---|
-| Open the page | Time plays by itself from July 2016, one month every three quarters of a second (about a minute and a half for all ten years), and loops after the latest month. The month and trip count flip over like a departure board, with a soft clack, and the whole fabric breathes. |
-| Click, tap or press any key | The sound starts (it is on by default, but browsers keep pages silent until your first click, tap or key press). |
-| ⏸ / ▶ button or Space | Pause or resume time. |
-| Move the mouse over the map | The threads part around your hand, and the flow speeds up near it. |
-| Press and hold | The grains gather into your hand. |
-| Drag a line | You pull that thread out of the network. Let go and it springs back. |
-| Click a line | **Listening mode**: that line comes forward, the rest fades back. Click it again (or empty space) to leave. |
-| Hover over the woven timeline | Preview any month's trips without moving there. |
-| Drag along the timeline, click a year, or use the scroll wheel | Travel through time yourself (one month per wheel notch; a year label jumps to its January). Playback pauses while you explore. |
-| ← / → | Step one month back or forward (pauses playback). |
-| Sun/moon switch or D | Switch between the dark theme (the default) and the light theme. Open the page with `?theme=light` to start in light. |
-| Speaker button | Mute or unmute the sound. The fabric keeps moving with the sound even while muted. |
-| R | Reset: leave listening mode and play again from July 2016. |
-
-**On a phone or tablet:** tap anywhere to start the sound, drag a finger across the map to part the threads, hold it still to gather them, drag along a line to pull it, tap a line to listen, and drag along the timeline to travel through time.
+![How to interact. Touch the fabric: hover the map to part the threads, press and hold to gather the grains, drag a line to pull it out (it springs back), click a line for listening mode; on a phone, drag, hold, drag a line or tap. Travel through time: it plays from July 2016 by itself, Space or the play button pauses, hover the timeline to preview a month, drag it, scroll or click a year to travel, arrow keys step a month. Sound and settings: click, tap or press a key to start the sound, the speaker button mutes it, the sun/moon switch or D changes theme, R resets.](docs/interactions.png)
 
 The sound is the city itself, and it follows the data. Three layers play together: a low **rumble** (trains in tunnels), a warm **hum** (the murmur of a crowd) and bright **taps** (Opal cards tapping on). A busy month plays all three; as the network empties the taps fade first, then the hum, until only a faint rumble is left in the 2020 lockdowns. The same sound moves the fabric: bass squeezes, mids shear, treble shivers, and loudness deepens the breathing.
 

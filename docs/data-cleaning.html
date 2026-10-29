@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Data cleaning</title>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,400;0,600;0,700;1,400&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* An animation of script/clean_data.py, recorded frame by frame into docs/data-cleaning.gif.
+       setTime(t) draws the moment t seconds in, so every frame is exact. */
+    :root { --navy: #0e111a; --panel: #151925; --ink: #f2efe6; --muted: #a3a9b8; --soft: #8d93a1; --amber: #e8a75e; --t1: #F5A93F; --red: #EE3D52; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--navy); width: 960px; height: 540px; overflow: hidden; font-family: Raleway, sans-serif; color: var(--ink); position: relative; }
+    .mono { font-family: 'Geist Mono', ui-monospace, monospace; }
+    .stripe { position: absolute; left: 40px; top: 26px; display: flex; gap: 6px; }
+    .stripe i { width: 16px; height: 3px; border-radius: 2px; display: block; }
+    h1 { position: absolute; left: 40px; top: 44px; font-size: 22px; font-weight: 700; }
+    h1 span { font-family: 'Geist Mono', monospace; font-weight: 400; font-size: 13px; color: var(--muted); margin-left: 10px; }
+    .steps { position: absolute; left: 40px; top: 86px; display: flex; gap: 8px; }
+    .step { font-family: 'Geist Mono', monospace; font-size: 11.5px; color: var(--soft); border: 1px solid rgba(242,239,230,0.16); border-radius: 4px; padding: 6px 10px; }
+    .step b { color: var(--muted); font-weight: 500; margin-right: 6px; }
+    .step.on { color: var(--navy); background: var(--amber); border-color: var(--amber); }
+    .step.on b { color: var(--navy); }
+    .step.done { color: var(--ink); border-color: rgba(232,167,94,0.5); }
+    .step.done b { color: var(--amber); }
+    .file { position: absolute; left: 40px; top: 136px; font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--muted); }
+    .file b { color: var(--ink); font-weight: 500; }
+    .table { position: absolute; left: 40px; top: 160px; width: 880px; height: 300px; }
+    .head, .row { position: absolute; left: 0; width: 880px; height: 30px; display: flex; align-items: center; font-family: 'Geist Mono', monospace; font-size: 12.5px; }
+    .head { top: 0; color: var(--soft); font-size: 10.5px; letter-spacing: 1.2px; border-bottom: 1px solid rgba(242,239,230,0.14); }
+    .row { border-bottom: 1px solid rgba(242,239,230,0.06); background: var(--navy); }
+    .c1 { width: 120px; padding-left: 12px; position: relative; }
+    .c2 { width: 190px; position: relative; }
+    .c3 { width: 420px; position: relative; }
+    .c4 { width: 150px; text-align: right; padding-right: 12px; position: relative; }
+    .swap { position: absolute; left: 0; top: 50%; transform: translateY(-50%); white-space: nowrap; }
+    .c1 .swap { left: 12px; }
+    .c4 .swap { left: auto; right: 12px; }
+    .chip { display: inline-block; background: var(--t1); color: var(--navy); font-weight: 600; border-radius: 3px; padding: 1px 7px; }
+    .new { color: var(--amber); }
+    .strike { position: absolute; left: 0; top: 50%; height: 1.5px; background: var(--red); }
+    .more { position: absolute; left: 12px; font-family: 'Geist Mono', monospace; font-size: 11.5px; color: var(--soft); }
+    .total { position: absolute; left: 0; top: 0; width: 880px; height: 44px; display: flex; align-items: center; font-family: 'Geist Mono', monospace; font-size: 15px; background: rgba(232,167,94,0.08); border: 1.5px solid var(--amber); border-radius: 6px; }
+    .caption { position: absolute; left: 40px; top: 476px; width: 880px; font-size: 15px; color: var(--muted); }
+    .caption em { color: var(--ink); font-style: normal; font-weight: 600; }
+    .out { position: absolute; left: 40px; top: 160px; width: 880px; border: 1px solid rgba(242,239,230,0.16); border-radius: 6px; background: var(--panel); padding: 16px 18px; font-family: 'Geist Mono', monospace; font-size: 13px; line-height: 26px; }
+    .out .h { color: var(--soft); }
+    .out .hl { color: var(--ink); background: rgba(232,167,94,0.12); margin: 0 -18px; padding: 0 18px; }
+    .out .hl b { color: var(--amber); font-weight: 500; }
+    .out .dim { color: var(--muted); }
+    .badge { position: absolute; right: 40px; top: 136px; font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--amber); }
+  </style>
+</head>
+<body>
+  <div class="stripe"><i style="background:#F5A93F"></i><i style="background:#25A9D1"></i><i style="background:#EC7A37"></i><i style="background:#3D86D6"></i><i style="background:#DC3A9F"></i><i style="background:#7E9EDB"></i><i style="background:#A3AEB5"></i><i style="background:#14B866"></i><i style="background:#EE3D52"></i></div>
+  <h1>Cleaning the Opal trips <span>script/clean_data.py</span></h1>
+  <div class="steps">
+    <div class="step" id="s1"><b>1</b>Read the raw rows</div>
+    <div class="step" id="s2"><b>2</b>Dates → YYYY-MM</div>
+    <div class="step" id="s3"><b>3</b>Keep T1–T9</div>
+    <div class="step" id="s4"><b>4</b>Add up card types</div>
+    <div class="step" id="s5"><b>5</b>Write the CSV</div>
+  </div>
+  <div class="file" id="file"><b>data/train.csv</b> · 21,823 rows, one per month × card type × line name</div>
+  <div class="badge" id="badge"></div>
+  <div class="table" id="table"></div>
+  <div class="out" id="out">
+    <div class="h">month,line,totalTrips,previousTrips,changeTrips</div>
+    <div class="dim">…</div>
+    <div class="hl"><b>2017-11,T1,12583123</b>,12583538,-415</div>
+    <div class="dim">2017-11,T2,7523359,7890830,-367471</div>
+    <div class="dim">2017-11,T3,2397793,2340497,57296</div>
+    <div class="dim">…</div>
+  </div>
+  <div class="caption" id="caption"></div>
+
+<script>
+// Real rows from data/train.csv (November 2017).
+const ROWS = [
+  ["Adult", "T1 North Shore, Northern and Western Line", 8131940],
+  ["Concession", "T1 North Shore, Northern and Western Line", 607709],
+  ["Adult", "T1 Northern Line", 609958],
+  ["Adult", "Blue Mountains Line", 633477],
+  ["Senior/Pensioner", "T1 North Shore Line", 47420],
+  ["Concession", "T1 Western Line", 39107],
+  ["School Student", "T1 Western Line", 26016],
+];
+const DROPPED = 3;
+const ROW_H = 32;
+
+const table = document.getElementById("table");
+table.innerHTML = '<div class="head"><div class="c1">YEAR_MONTH</div><div class="c2">CARD_TYPE</div><div class="c3">LINE</div><div class="c4">TRIP</div></div>';
+const rowEls = ROWS.map((r, i) => {
+  const el = document.createElement("div");
+  el.className = "row";
+  el.innerHTML =
+    `<div class="c1"><span class="swap a">Nov-17</span><span class="swap b new">2017-11</span></div>` +
+    `<div class="c2"><span class="swap a">${r[0]}</span></div>` +
+    `<div class="c3"><span class="swap a">${r[1]}</span><span class="swap b">${i === DROPPED ? "" : '<span class="chip">T1</span>'}</span>` +
+    (i === DROPPED ? '<div class="strike"></div>' : "") + `</div>` +
+    `<div class="c4"><span class="swap a">${r[2].toLocaleString("en-AU")}</span></div>`;
+  table.appendChild(el);
+  return el;
+});
+const more = document.createElement("div");
+more.className = "more";
+more.textContent = "… 21,816 more rows";
+table.appendChild(more);
+const total = document.createElement("div");
+total.className = "total";
+total.innerHTML = '<div class="c1"><span class="swap new">2017-11</span></div><div class="c2"><span class="swap" style="color:var(--muted)">all 9 card types</span></div><div class="c3"><span class="swap"><span class="chip">T1</span></span></div><div class="c4"><span class="swap" id="sum"></span></div>';
+table.appendChild(total);
+
+const clamp = (v) => Math.max(0, Math.min(1, v));
+const ease = (v) => { v = clamp(v); return v * v * (3 - 2 * v); };
+const span = (t, a, b) => ease((t - a) / (b - a));
+const $ = (id) => document.getElementById(id);
+
+const DURATION = 14;
+function setTime(t) {
+  // Which step is lit
+  const stepStarts = [0, 2.6, 5.0, 7.6, 11.2];
+  stepStarts.forEach((start, i) => {
+    const el = $("s" + (i + 1));
+    const next = stepStarts[i + 1] ?? 99;
+    el.className = "step" + (t >= start && t < next ? " on" : t >= next ? " done" : "");
+  });
+
+  const fadeIn = span(t, 0, 0.6);
+  const fadeOutAll = 1 - span(t, DURATION - 0.5, DURATION);
+  document.body.style.opacity = Math.min(fadeIn + 0.0001, 1) * fadeOutAll;
+
+  const dates = span(t, 2.8, 3.6);
+  const lines = span(t, 5.2, 6.0);
+  const drop = span(t, 6.5, 7.1);
+  const dropFade = span(t, 6.0, 6.5);
+  const merge = span(t, 7.8, 9.0);
+  const count = span(t, 8.6, 9.8);
+  const output = span(t, 11.2, 12.0);
+
+  rowEls.forEach((el, i) => {
+    const [c1a, c1b] = el.querySelectorAll(".c1 .swap");
+    c1a.style.opacity = 1 - dates; c1b.style.opacity = dates;
+    const [c3a, c3b] = el.querySelectorAll(".c3 .swap");
+    c3a.style.opacity = i === DROPPED ? 1 : 1 - lines;
+    c3b.style.opacity = lines;
+    if (i === DROPPED) el.querySelector(".strike").style.width = (lines * c3a.offsetWidth) + "px";
+
+    // Rows close the gap left by the dropped row, then slide together into the total.
+    let slot = i > DROPPED ? i - drop : i;
+    let y = 34 + slot * ROW_H;
+    const mergeY = 34 + 2.5 * ROW_H;
+    y = y + (mergeY - y) * merge;
+    el.style.top = y + "px";
+    let opacity = 1;
+    if (i === DROPPED) opacity = 1 - dropFade;
+    opacity *= 1 - span(t, 8.4, 9.0);
+    el.style.opacity = opacity;
+    el.querySelector(".c2").style.opacity = 1 - span(t, 7.6, 8.2);
+  });
+  more.style.top = (34 + (ROWS.length - drop) * ROW_H + 8) + "px";
+  more.textContent = t < 6 ? "… 21,816 more rows" : "… 30 more T1 rows for Nov-17 (4 line names × 9 card types = 36)";
+  more.style.opacity = 1 - span(t, 7.8, 8.4);
+
+  total.style.top = (34 + 2.5 * ROW_H - 6) + "px";
+  total.style.opacity = span(t, 8.4, 9.0);
+  $("sum").textContent = Math.round(12583123 * count).toLocaleString("en-AU");
+
+  table.style.opacity = 1 - output;
+  $("out").style.opacity = output;
+  $("file").innerHTML = t < 11.2
+    ? "<b>data/train.csv</b> · 21,823 rows, one per month × card type × line name"
+    : "<b>data/monthly_line_trips_full.csv</b> · 1,098 rows = 122 months × 9 lines";
+  $("badge").textContent = t >= 11.2 ? "→ read by TripData" : "";
+
+  const captions = [
+    [0, "The raw export has a row for every <em>month</em>, <em>card type</em> and <em>line name</em>."],
+    [2.6, "Dates come as <em>Nov-17</em> or <em>Sep-2025</em>, so they become sortable <em>YYYY-MM</em>."],
+    [5.0, "Old and new line names are grouped into <em>T1–T9</em>; intercity and regional lines are left out."],
+    [7.6, "Every card type and line name is added up: <em>36 rows become one</em> T1 total for Nov 2017."],
+    [11.2, "One clean row per month and line, plus the change from the month before."],
+  ];
+  let caption = captions[0][1];
+  for (const [start, text] of captions) if (t >= start) caption = text;
+  $("caption").innerHTML = caption;
+}
+window.setTime = setTime;
+window.DURATION = DURATION;
+setTime(new URLSearchParams(location.search).get("t") ?? 1.5);
+</script>
+</body>
+</html>
