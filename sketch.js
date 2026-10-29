@@ -2,19 +2,18 @@
 // Commuter Loom: collective movement memory, woven from monthly Sydney
 // train trips.
 //
-// This file brings everything together. It loads the data, creates one
-// object for each part of the artwork, and calls them every frame. The
-// actual work happens in the classes:
-//   utils/      ColourTheme, TripData, RailNetwork + TrackPath, and the
-//               interface: PageHeader, Timeline, DataPanel,
-//               PlaybackControls
-//   utils/      FabricBreath (the network breathing with the data)
+// This file brings everything together. It loads the data and sound,
+// creates one object for each part of the artwork, and calls them in order
+// every frame. The actual work happens in the classes:
+//   utils/      TripData, RailNetwork + TrackPath, Timeline, FabricBreath,
+//               DataPanel, InterfaceOverlay
 //   mechanics/  LineStream + Grain + FabricPress (Perlin noise and
 //               randomness), InputControls (user input), AudioReactive
 //               (audio)
+//
+// AI acknowledgement: the structure of this project was planned with the
+// help of Claude (Anthropic). See README.md for details.
 
-// Monthly Opal trips for each Sydney Trains line, made from the raw
-// Transport for NSW data (data/train.csv) by script/clean_data.py.
 const DATA_PATH = "data/monthly_line_trips_full.csv";
 // The three layers of the city sound (see mechanics/audio-reactive.js).
 const RUMBLE_PATH = "assets/city-rumble.wav";
@@ -36,40 +35,18 @@ let flipSound;
 let theme;
 let tripData;
 let railNetwork;
-let inputControls;
-// One stream of grains per line, and the dent the pointer presses into
-// them (mechanics/perlin-flow.js).
-let lineStreams = [];
-let fabricPress;
-// The interface around the artwork.
-let pageHeader;
 let timeline;
-let dataPanel;
-let playbackControls;
-// The city sound, and the breathing it deepens.
-let audioReactive;
 let fabricBreath;
+let dataPanel;
+let overlay;
+let inputControls;
+let audioReactive;
+let lineStreams = [];
+// The dent the pointer presses into the grains (mechanics/perlin-flow.js).
+let fabricPress;
 
-// Whether the mouse (or finger) went down on the interface rather than the
-// map, and the timeline or data panel chart being dragged, or null.
-let pressedOnInterface = false;
-let monthPicker = null;
-
-// Whether the pointer is on the canvas: a mouse over it, or a finger
-// touching it. Touch screens have no hover, so a lifted finger stops
-// pressing.
-let pointerOnCanvas = false;
-
-// Fallback: set to true to draw the old solid tracks instead of the grains.
-const SHOW_SOLID_TRACKS = false;
-
-// The month the artwork shows. The timeline, the data panel's chart, the
-// play button and the arrow keys all change it through setMonth().
-// It starts on the latest month in the data. To start on another month
-// while testing, put its number here instead of null: 0 = July 2016,
-// 1 = August 2016, ... 45 = April 2020, ... 121 = August 2026.
-const START_MONTH_INDEX = null;
-let monthIndex = 0;
+// The month shown last frame, to notice when a new month flips over.
+let lastMonthShown = -1;
 
 // Heavy files are loaded before setup() runs, so they are ready to use.
 function preload() {
@@ -81,24 +58,22 @@ function preload() {
 }
 
 function setup() {
-  let canvas = createCanvas(windowWidth, windowHeight);
-  canvas.mouseOut(handlePointerLeft);
+  createCanvas(windowWidth, windowHeight);
+  // Raleway is loaded by style.css from assets/fonts.
+  textFont("Raleway");
 
   // The dark theme is the default. getURLParams() reads the page address,
   // so ...index.html?theme=light starts in the light theme.
   theme = new ColourTheme(getURLParams().theme);
 
   tripData = new TripData(tripTable, LINE_NAMES);
+  overlay = new InterfaceOverlay(theme);
+  timeline = new Timeline(tripData, theme);
+  fabricBreath = new FabricBreath();
+  dataPanel = new DataPanel(tripData, theme);
   railNetwork = new RailNetwork(STATIONS, LINE_ROUTES, LANE_ORDER, theme);
-  timeline = new Timeline(tripData, LINE_NAMES);
-  dataPanel = new DataPanel(tripData);
-  fitMap();
-
-  if (START_MONTH_INDEX === null) {
-    setMonth(tripData.getMonthCount() - 1);
-  } else {
-    setMonth(START_MONTH_INDEX);
-  }
+  // Keep line badges and station names out from under the data panel.
+  fitMapAndPanel();
 
   for (let lineName of LINE_NAMES) {
     lineStreams.push(new LineStream(lineName, tripData));
@@ -106,222 +81,75 @@ function setup() {
   fillStreams();
   fabricPress = new FabricPress();
 
-  inputControls = new InputControls(railNetwork);
-  playbackControls = new PlaybackControls();
-  pageHeader = new PageHeader(tripData, OFFICIAL_LINE_COLOURS);
-
-  fabricBreath = new FabricBreath();
   audioReactive = new AudioReactive(rumbleSound, humSound, tapsSound, flipSound);
   // Sound is on by default: start the layers now. The browser lets them be
   // heard from the visitor's first click, tap or key press.
-  audioReactive.start(pageHeader);
+  audioReactive.start(overlay);
+  inputControls = new InputControls(railNetwork, timeline, overlay);
 
   // Buttons respond to a mouse press, or to a finger lifting on a touch
-  // screen.
-  theme.button.mousePressed(toggleTheme);
-  theme.button.touchEnded(toggleTheme);
-  playbackControls.playButton.mousePressed(togglePlayback);
-  playbackControls.playButton.touchEnded(togglePlayback);
+  // screen (browsers only allow sound to start when the finger lifts).
   audioReactive.button.mousePressed(toggleAudio);
   audioReactive.button.touchEnded(toggleAudio);
-  positionControls();
+  timeline.playButton.mousePressed(toggleTimePlayback);
+  timeline.playButton.touchEnded(toggleTimePlayback);
+  theme.button.mousePressed(toggleTheme);
+  theme.button.touchEnded(toggleTheme);
+  layoutInterface();
+
+  overlay.setStatus("Tap or click anywhere to hear the network · touch the threads · drag a line to pull it · tap a line to listen");
 }
 
 function draw() {
-  if (playbackControls.update()) {
-    stepPlayback();
-  }
-
-  // The sound follows the month's data, and the network breathes with the
-  // data, deepened by how loud the sound is.
-  audioReactive.update();
-  fabricBreath.update(tripData.getNetworkRatio(monthIndex), audioReactive.getLevel());
-  audioReactive.followData(fabricBreath.getBusyness());
-
   background(theme.getBackground(255));
-  railNetwork.drawTrackGuides();
-  // The pointer presses into the threads while it is over the map (not
-  // the timeline or the data panel), and presses deeper while the mouse
-  // button or a finger is held down.
-  let pointerOverMap = pointerOnCanvas && monthPicker === null && !isOverInterface(mouseX, mouseY);
-  fabricPress.update(mouseX, mouseY, pointerOverMap, mouseIsPressed && !pressedOnInterface);
-  if (SHOW_SOLID_TRACKS) {
-    drawTracks(inputControls.selectedLineName);
-  } else {
-    drawStreams(inputControls.selectedLineName);
-  }
 
-  // Labels on top. In listening mode, the other lines' badges fade back.
+  // 1. Update the mechanics that every grain reads from. The month's data
+  // sets the sound and the breathing; the sound's loudness deepens the
+  // breathing too.
+  timeline.update();
+  // A new month: play the departure-board "clack".
+  if (timeline.monthIndex !== lastMonthShown) {
+    if (lastMonthShown !== -1) {
+      audioReactive.playFlip();
+    }
+    lastMonthShown = timeline.monthIndex;
+  }
+  audioReactive.update();
+  fabricBreath.update(tripData.getNetworkRatio(timeline.monthIndex), audioReactive.getLevel());
+  audioReactive.followData(fabricBreath.getBusyness());
+  dataPanel.update(timeline.monthIndex, inputControls.selectedLineName, fabricBreath);
+  inputControls.update();
+  fabricPress.update(mouseX, mouseY, inputControls.handIsActive, inputControls.handIsGathering);
+
+  // 2. Move and draw the grains, line by line.
+  // Everything on the map is clipped to the map's area (above the control
+  // dock, and above the data card on phones), so the train lines end
+  // exactly there and nothing shows behind the controls. beginClip() and
+  // endClip() (p5.js 1.8) make a window: only drawing inside the rectangle
+  // appears, until pop().
+  push();
+  beginClip();
+  rect(0, 0, width, railNetwork.mapBottom);
+  endClip();
+
+  railNetwork.drawTrackGuides();
+  drawStreams(inputControls.selectedLineName);
+  pop();
+
+  // 3. Labels and interface on top.
+  overlay.drawFades();
   railNetwork.drawStationLabels();
   railNetwork.drawLineBadges(inputControls.selectedLineName);
+  overlay.drawHeader(tripData, timeline.monthIndex, inputControls.selectedLineName, fabricBreath, dataPanel);
+  dataPanel.draw(timeline.monthIndex, inputControls.selectedLineName, fabricBreath, timeline.pulse);
 
-  drawDock();
-  dataPanel.draw(theme, monthIndex);
-}
-
-// The control dock along the bottom: the buttons on the left (HTML, see
-// positionControls()) and the timeline. Narrow screens stack the timeline
-// above the buttons.
-const DOCK_HEIGHT = 72;
-const NARROW_DOCK_HEIGHT = 124;
-const NARROW_SCREEN_WIDTH = 640;
-// Room at the top for the title. The map is fitted below it.
-const HEADER_HEIGHT = 64;
-const NARROW_HEADER_HEIGHT = 96;
-// The sound button, play button and theme switch side by side.
-const BUTTON_ROW_LEFT = 20;
-const BUTTON_ROW_WIDTH = 188;
-
-// Lays out the map, the timeline and the data panel to fill the window.
-function fitMap() {
-  let isNarrow = width < NARROW_SCREEN_WIDTH;
-  let dockTop = height - DOCK_HEIGHT;
-  railNetwork.mapTop = HEADER_HEIGHT;
-  railNetwork.mapBottom = dockTop;
-
-  let panelWidth = 200;
-  let panelLeft = width - panelWidth - 20;
-  let panelTop = 0;
-  if (isNarrow) {
-    // Narrow screens: the map has no room to spare, so the panel becomes a
-    // strip across the bottom, above the timeline, and the map (with the
-    // title above it taking more lines) is fitted above both.
-    dockTop = height - NARROW_DOCK_HEIGHT;
-    panelWidth = width - 24;
-    panelLeft = 12;
-    dataPanel.setArea(0, 0, panelWidth, true);
-    panelTop = dockTop - dataPanel.getHeight() - 8;
-    railNetwork.mapTop = NARROW_HEADER_HEIGHT;
-    railNetwork.mapBottom = panelTop - 8;
-    timeline.setArea(20, dockTop + 6, width - 20, dockTop + 64);
-  } else {
-    // The data panel sits at the bottom right, above the dock. On tall
-    // screens the map's southern lines run down the right, so it moves to
-    // the top right instead, under the header.
-    dataPanel.setArea(0, 0, panelWidth, false);
-    panelTop = dockTop - dataPanel.getHeight() - 12;
-    if (height > width) {
-      panelTop = HEADER_HEIGHT + 40;
-    }
-    timeline.setArea(BUTTON_ROW_LEFT + BUTTON_ROW_WIDTH + 28, dockTop + 8, width - 24, height - 6);
-  }
-  dataPanel.setArea(panelLeft, panelTop, panelWidth, isNarrow);
-  railNetwork.reservedArea = {
-    left: panelLeft,
-    top: panelTop,
-    right: panelLeft + panelWidth,
-    bottom: panelTop + dataPanel.getHeight(),
-  };
-
-  railNetwork.build();
-}
-
-// Puts the sound button, play button and theme switch in a row at the
-// bottom left, level with the timeline's bars (or under the timeline on
-// narrow screens).
-function positionControls() {
-  let rowMiddle = railNetwork.mapBottom + 38;
-  if (width < NARROW_SCREEN_WIDTH) {
-    rowMiddle = height - 30;
-  }
-  audioReactive.button.position(BUTTON_ROW_LEFT, rowMiddle - 20);
-  playbackControls.playButton.position(BUTTON_ROW_LEFT + 50, rowMiddle - 24);
-  theme.button.position(BUTTON_ROW_LEFT + 108, rowMiddle - 22);
-}
-
-// The dock's background (covering anything pressed over the map's bottom
-// edge), a thin line along its top, and the timeline. On narrow screens
-// the dock starts at the data panel strip.
-function drawDock() {
-  let dockTop = railNetwork.mapBottom;
-  noStroke();
-  fill(theme.getBackground(255));
-  rect(0, dockTop, width, height - dockTop);
-  stroke(theme.getTextColour(45));
-  strokeWeight(1);
-  line(0, dockTop + 0.5, width, dockTop + 0.5);
-  timeline.draw(theme, monthIndex);
-}
-
-// Button callbacks. p5's mousePressed() on a button needs a plain
-// function, so these pass the click on.
-function toggleTheme() {
-  theme.toggle();
-}
-
-function toggleAudio() {
-  audioReactive.toggleMute(pageHeader);
-}
-
-// Play from where the artwork is. At the last month, play starts again
-// from the first.
-function togglePlayback() {
-  if (playbackControls.isPlaying) {
-    setPlaying(false);
-  } else {
-    if (monthIndex === tripData.getMonthCount() - 1) {
-      setMonth(0);
-    }
-    setPlaying(true);
-  }
-}
-
-function setPlaying(isPlaying) {
-  playbackControls.setPlaying(isPlaying);
-  pageHeader.showPlaying(isPlaying);
-}
-
-// While playing: on to the next month, stopping after the last one.
-function stepPlayback() {
-  if (monthIndex < tripData.getMonthCount() - 1) {
-    setMonth(monthIndex + 1);
-  } else {
-    setPlaying(false);
-  }
-}
-
-// Shows a month. The streams ease to its density in drawStreams(), and the
-// timeline and data panel read monthIndex when they draw.
-// A new month also plays the departure-board "clack".
-function setMonth(newMonthIndex) {
-  let previousMonthIndex = monthIndex;
-  monthIndex = constrain(newMonthIndex, 0, tripData.getMonthCount() - 1);
-  if (monthIndex !== previousMonthIndex && audioReactive !== undefined) {
-    audioReactive.playFlip();
-  }
-}
-
-// Back to the first month, paused.
-function restart() {
-  setPlaying(false);
-  setMonth(0);
-}
-
-// The dock along the bottom and the data panel are the interface. The
-// rest of the window is the map.
-function isOverInterface(x, y) {
-  return y >= railNetwork.mapBottom || dataPanel.contains(x, y);
-}
-
-// The timeline or data panel chart under a point, or null.
-function findMonthPicker(x, y) {
-  if (timeline.contains(x, y)) {
-    return timeline;
-  }
-  if (dataPanel.chartContains(x, y)) {
-    return dataPanel;
-  }
-  return null;
-}
-
-// A press on the timeline or chart pauses playing and jumps to the month
-// under the pointer. Dragging keeps choosing.
-function startPickingMonth() {
-  monthPicker = findMonthPicker(mouseX, mouseY);
-  if (monthPicker !== null) {
-    setPlaying(false);
-    setMonth(monthPicker.getMonthAt(mouseX));
-  }
+  // 4. The control dock along the bottom: its background, the woven
+  // timeline and the status message. (The buttons are HTML on top of it.)
+  // The timeline shows a hover preview for a mouse (not touch), and the
+  // current month's card while it is being dragged.
+  overlay.drawDock();
+  timeline.draw(!inputControls.usingTouch, inputControls.isScrubbingTimeline);
+  overlay.drawFooter();
 }
 
 // Gives every line's stream its grains, on the tracks just built.
@@ -333,12 +161,11 @@ function fillStreams() {
 
 // Moves and draws every line's grains, with the density, speed and
 // brightness of the month shown, pressed by the pointer. In listening mode
-// the selected line is drawn last (on top) and the others fade back, as
-// the solid tracks below did.
+// the selected line is drawn last (on top) and the others fade back.
 function drawStreams(selectedLineName) {
   let selectedStream = null;
   for (let stream of lineStreams) {
-    stream.setMonth(monthIndex);
+    stream.setMonth(timeline.monthIndex);
     stream.update();
     if (stream.lineName === selectedLineName) {
       selectedStream = stream;
@@ -355,102 +182,85 @@ function drawStreams(selectedLineName) {
   }
 }
 
-// Fallback (see SHOW_SOLID_TRACKS): each track drawn as a solid line in
-// its line's colour, thicker for busier lines. The grain streams in
-// drawStreams() replace it.
-// In listening mode the selected line is drawn last (on top) and the
-// others fade back.
-function drawTracks(selectedLineName) {
-  noFill();
-  for (let lineName of LINE_NAMES) {
-    if (lineName !== selectedLineName) {
-      let lineColour = color(theme.getLineColour(lineName));
-      if (selectedLineName !== null) {
-        lineColour.setAlpha(60);
-      }
-      drawLineTracks(lineName, lineColour);
-    }
-  }
-  if (selectedLineName !== null) {
-    drawLineTracks(selectedLineName, color(theme.getLineColour(selectedLineName)));
+// Button callbacks. p5's mousePressed() on a button needs a plain function,
+// so these pass the click on to the right object.
+function toggleAudio() {
+  audioReactive.toggleMute(overlay);
+}
+
+function toggleTimePlayback() {
+  timeline.togglePlaying();
+}
+
+// Builds the map's tracks, keeping line badges and station names out from
+// under the data panel.
+function fitMapAndPanel() {
+  // The data panel sits just above the control dock, and the map fills the
+  // space above that (the full panel only takes a corner; the phone card
+  // takes the whole width).
+  dataPanel.setDockTop(overlay.getDockTop());
+  railNetwork.mapBottom = dataPanel.getMapBottom();
+  railNetwork.reservedArea = dataPanel.getArea();
+  railNetwork.build();
+}
+
+function toggleTheme() {
+  theme.toggle();
+}
+
+// Fits the buttons and timeline to the window (compact on phones).
+function layoutInterface() {
+  overlay.positionButtons(audioReactive.button, timeline.playButton, theme.button);
+  if (overlay.isSlimDock()) {
+    // One-row dock: the woven strip starts just right of the buttons.
+    timeline.resize(overlay.isCompact(), overlay.getTimelineBaseY(), overlay.buttonArea.right + 28, overlay.getSlimStripHeight());
+  } else {
+    timeline.resize(overlay.isCompact(), overlay.getTimelineBaseY());
   }
 }
 
-function drawLineTracks(lineName, lineColour) {
-  stroke(lineColour);
-  strokeWeight(map(tripData.getLineVolume(lineName), 0, 1, 1.5, 4));
-  for (let path of railNetwork.getPathsFor(lineName)) {
-    beginShape();
-    for (let point of path.points) {
-      vertex(point.x, point.y);
-    }
-    endShape();
-  }
-}
-
-// p5 event functions: presses on the interface (the dock and the data
-// panel) go to the timeline and chart; everything else is handed to the
-// input mechanic. Each also notes whether the pointer is on the canvas
-// (for the fabric press).
+// p5 event functions: each one hands the event to the input mechanic.
+// Returning false stops the browser's default behaviour (e.g. text
+// selection while dragging, or the page scrolling when space is pressed).
 function mouseMoved() {
-  pointerOnCanvas = true;
-  if (isOverInterface(mouseX, mouseY)) {
-    if (findMonthPicker(mouseX, mouseY) !== null) {
-      cursor(HAND);
-    } else {
-      cursor(ARROW);
-    }
-    return;
-  }
   inputControls.handleMouseMoved();
 }
 
 function mousePressed() {
-  pointerOnCanvas = true;
-  pressedOnInterface = isOverInterface(mouseX, mouseY);
-  if (pressedOnInterface) {
-    startPickingMonth();
-    return;
-  }
   inputControls.handleMousePressed();
 }
 
 function mouseDragged() {
-  if (monthPicker !== null) {
-    setMonth(monthPicker.getMonthAt(mouseX));
-  }
-}
-
-// Canvas callback: the mouse has left the canvas, so the press lifts.
-function handlePointerLeft() {
-  pointerOnCanvas = false;
+  inputControls.handleMouseDragged();
+  return false;
 }
 
 function mouseReleased() {
-  if (pressedOnInterface) {
-    pressedOnInterface = false;
-    monthPicker = null;
-    return;
-  }
   inputControls.handleMouseReleased();
 }
 
 // Touch screens. Returning false stops the browser from also sending
 // pretend mouse events afterwards (which would count every tap twice) and
-// from scrolling or zooming the page while you touch the artwork.
+// from scrolling or zooming the page while you drag on the artwork.
 function touchStarted() {
-  mousePressed();
+  inputControls.handleTouchStarted();
   return false;
 }
 
 function touchMoved() {
-  mouseDragged();
+  inputControls.handleMouseDragged();
   return false;
 }
 
 function touchEnded() {
-  pointerOnCanvas = false;
-  mouseReleased();
+  inputControls.handleMouseReleased();
+  return false;
+}
+
+// The scroll wheel steps through the months. event.delta is how far the
+// wheel moved. Returning false stops the page itself from scrolling.
+function mouseWheel(event) {
+  inputControls.handleMouseWheel(event.delta);
   return false;
 }
 
@@ -459,39 +269,17 @@ function keyPressed() {
   if (key === "d" || key === "D") {
     theme.toggle();
   }
-  // R leaves listening mode (in the input mechanic) and restarts the
-  // timeline from the first month.
   inputControls.handleKeyPressed();
-  if (key === "r" || key === "R") {
-    restart();
-  }
-
-  // The arrow keys step one month back or forward, and space plays or
-  // pauses. Returning false stops the browser using these keys too (for
-  // scrolling, or pressing a focused button).
-  if (keyCode === LEFT_ARROW) {
-    setPlaying(false);
-    setMonth(monthIndex - 1);
-    return false;
-  }
-  if (keyCode === RIGHT_ARROW) {
-    setPlaying(false);
-    setMonth(monthIndex + 1);
-    return false;
-  }
-  if (key === " ") {
-    togglePlayback();
+  if (key === " " || keyCode === LEFT_ARROW || keyCode === RIGHT_ARROW) {
     return false;
   }
 }
 
-// Keep the artwork filling the window: lay out the map, timeline and data
-// panel for the new size, refill each line with grains on the new tracks,
-// and move the buttons to the new bottom edge. The playhead stays on the
-// same month.
+// Keep the artwork filling the window: rebuild the tracks for the new size
+// and refill each line with grains to match the new track lengths.
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  fitMap();
+  fitMapAndPanel();
   fillStreams();
-  positionControls();
+  layoutInterface();
 }

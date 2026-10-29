@@ -10,6 +10,8 @@
 // AI acknowledgement: this class was written with the help of Claude
 // (Anthropic).
 
+const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
 class TripData {
   constructor(table, lineNames) {
     this.lineNames = lineNames;
@@ -33,6 +35,10 @@ class TripData {
 
     this.readTable(table);
     this.calculateAverages();
+
+    // The months when the whole network was unusually quiet (the COVID-19
+    // period). Shown on the timeline.
+    this.quietPeriod = this.findQuietPeriod();
   }
 
   readTable(table) {
@@ -105,5 +111,51 @@ class TripData {
   // about 1.3 in a busy month, 0.2 during the 2020 and 2021 lockdowns.
   getNetworkRatio(monthIndex) {
     return this.getNetworkTrips(monthIndex) / max(this.networkAverage, 1);
+  }
+
+  // Finds the longest run of months where the whole network carried less
+  // than 55% of its average. Worked out from the data rather than typed in,
+  // so it still works if the dataset is updated.
+  findQuietPeriod() {
+    let quietThreshold = this.networkAverage * 0.55;
+
+    let bestStart = -1;
+    let bestEnd = -1;
+    let runStart = -1;
+    for (let i = 0; i <= this.months.length; i++) {
+      let isQuiet = i < this.months.length && this.getNetworkTrips(i) < quietThreshold;
+      if (isQuiet && runStart === -1) {
+        // A quiet run starts.
+        runStart = i;
+      } else if (!isQuiet && runStart !== -1) {
+        // A quiet run ends. Keep it if it is the longest so far.
+        if (i - runStart > bestEnd - bestStart) {
+          bestStart = runStart;
+          bestEnd = i - 1;
+        }
+        runStart = -1;
+      }
+    }
+
+    if (bestStart === -1) {
+      return null;
+    }
+    return { startIndex: bestStart, endIndex: bestEnd };
+  }
+
+  // "2020-03" -> "Mar 2020"
+  formatMonth(monthIndex) {
+    let month = this.months[constrain(monthIndex, 0, this.months.length - 1)];
+    let year = month.substring(0, 4);
+    let monthNumber = int(month.substring(5, 7));
+    return MONTH_NAMES[monthNumber - 1] + " " + year;
+  }
+
+  isJanuary(monthIndex) {
+    return this.months[monthIndex].endsWith("-01");
+  }
+
+  getYear(monthIndex) {
+    return this.months[monthIndex].substring(0, 4);
   }
 }

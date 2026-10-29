@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <!-- Commuter Loom logo: four train-line threads woven over and under four plain threads. -->
+  <rect width="48" height="48" rx="11" fill="#0e111a"/>
+  <g fill="none" stroke-linecap="butt">
+    <path d="M6 10.5H42" stroke="#F5A93F" stroke-width="5.5"/>
+    <path d="M6 19.5H42" stroke="#25A9D1" stroke-width="5.5"/>
+    <path d="M6 28.5H42" stroke="#14B866" stroke-width="5.5"/>
+    <path d="M6 37.5H42" stroke="#EE3D52" stroke-width="5.5"/>
+    <path d="M10.5 6V42" stroke="#0e111a" stroke-width="7.5"/>
+    <path d="M10.5 6V42" stroke="#f2efe6" stroke-width="5.5"/>
+    <path d="M19.5 6V42" stroke="#0e111a" stroke-width="7.5"/>
+    <path d="M19.5 6V42" stroke="#f2efe6" stroke-width="5.5"/>
+    <path d="M28.5 6V42" stroke="#0e111a" stroke-width="7.5"/>
+    <path d="M28.5 6V42" stroke="#f2efe6" stroke-width="5.5"/>
+    <path d="M37.5 6V42" stroke="#0e111a" stroke-width="7.5"/>
+    <path d="M37.5 6V42" stroke="#f2efe6" stroke-width="5.5"/>
+    <path d="M5.75 10.5H15.25" stroke="#0e111a" stroke-width="7.5"/>
+    <path d="M4.9 10.5H16.1" stroke="#F5A93F" stroke-width="5.5"/>
+    <path d="M23.75 10.5H33.25" stroke="#0e111a" stroke-width="7.5"/>
+    <path d="M22.9 10.5H34.1" stroke="#F5A93F" stroke-width="5.5"/>
+    <path d="M14.75 19.5H24.25" stroke="#0e111a" stroke-width="7.5"/>
+    <path d="M13.9 19.5H25.1" stroke="#25A9D1" stroke-width="5.5"/>
+    <path d="M32.75 19.5H42.25" stroke="#0e111a" stroke-width="7.5"/>
+    <path d="M31.9 19.5H43.1" stroke="#25A9D1" stroke-width="5.5"/>
+    <path d="M5.75 28.5H15.25" stroke="#0e111a" stroke-width="7.5"/>
+    <path d="M4.9 28.5H16.1" stroke="#14B866" stroke-width="5.5"/>
+    <path d="M23.75 28.5H33.25" stroke="#0e111a" stroke-width="7.5"/>
+    <path d="M22.9 28.5H34.1" stroke="#14B866" stroke-width="5.5"/>
+    <path d="M14.75 37.5H24.25" stroke="#0e111a" stroke-width="7.5"/>
+    <path d="M13.9 37.5H25.1" stroke="#EE3D52" stroke-width="5.5"/>
+    <path d="M32.75 37.5H42.25" stroke="#0e111a" stroke-width="7.5"/>
+    <path d="M31.9 37.5H43.1" stroke="#EE3D52" stroke-width="5.5"/>
+  </g>
+</svg>

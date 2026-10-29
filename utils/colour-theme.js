@@ -87,7 +87,7 @@ class ColourTheme {
     this.name = "dark";
     this.palette = DARK_PALETTE;
 
-    // The switch is placed from sketch.js.
+    // The switch is placed by InterfaceOverlay.positionButtons().
     // role="switch" tells screen readers it is an on/off switch, and
     // aria-checked (set in use()) says whether dark mode is on.
     this.button = createButton(THEME_SWITCH_HTML);
