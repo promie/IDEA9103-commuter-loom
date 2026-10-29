@@ -8,17 +8,29 @@
 //   utils/      ColourTheme, TripData, RailNetwork + TrackPath, and the
 //               interface: PageHeader, Timeline, DataPanel,
 //               PlaybackControls
+//   utils/      FabricBreath (the network breathing with the data)
 //   mechanics/  LineStream + Grain + FabricPress (Perlin noise and
-//               randomness), InputControls (user input)
+//               randomness), InputControls (user input), AudioReactive
+//               (audio)
 
 // Monthly Opal trips for each Sydney Trains line, made from the raw
 // Transport for NSW data (data/train.csv) by script/clean_data.py.
 const DATA_PATH = "data/monthly_line_trips_full.csv";
+// The three layers of the city sound (see mechanics/audio-reactive.js).
+const RUMBLE_PATH = "assets/city-rumble.wav";
+const HUM_PATH = "assets/city-hum.wav";
+const TAPS_PATH = "assets/city-taps.wav";
+// The "clack" played each time a new month flips over.
+const FLIP_PATH = "assets/city-flip.wav";
 // The Sydney Trains lines. Their colours live in utils/colour-theme.js.
 const LINE_NAMES = ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9"];
 
 // Loaded in preload().
 let tripTable;
+let rumbleSound;
+let humSound;
+let tapsSound;
+let flipSound;
 
 // The objects that make up the artwork, created in setup().
 let theme;
@@ -34,6 +46,9 @@ let pageHeader;
 let timeline;
 let dataPanel;
 let playbackControls;
+// The city sound, and the breathing it deepens.
+let audioReactive;
+let fabricBreath;
 
 // Whether the mouse (or finger) went down on the interface rather than the
 // map, and the timeline or data panel chart being dragged, or null.
@@ -59,6 +74,10 @@ let monthIndex = 0;
 // Heavy files are loaded before setup() runs, so they are ready to use.
 function preload() {
   tripTable = loadTable(DATA_PATH, "csv", "header");
+  rumbleSound = loadSound(RUMBLE_PATH);
+  humSound = loadSound(HUM_PATH);
+  tapsSound = loadSound(TAPS_PATH);
+  flipSound = loadSound(FLIP_PATH);
 }
 
 function setup() {
@@ -91,14 +110,20 @@ function setup() {
   playbackControls = new PlaybackControls();
   pageHeader = new PageHeader(tripData, OFFICIAL_LINE_COLOURS);
 
+  fabricBreath = new FabricBreath();
+  audioReactive = new AudioReactive(rumbleSound, humSound, tapsSound, flipSound);
+  // Sound is on by default: start the layers now. The browser lets them be
+  // heard from the visitor's first click, tap or key press.
+  audioReactive.start(pageHeader);
+
   // Buttons respond to a mouse press, or to a finger lifting on a touch
   // screen.
   theme.button.mousePressed(toggleTheme);
   theme.button.touchEnded(toggleTheme);
   playbackControls.playButton.mousePressed(togglePlayback);
   playbackControls.playButton.touchEnded(togglePlayback);
-  playbackControls.soundButton.mousePressed(toggleSound);
-  playbackControls.soundButton.touchEnded(toggleSound);
+  audioReactive.button.mousePressed(toggleAudio);
+  audioReactive.button.touchEnded(toggleAudio);
   positionControls();
 }
 
@@ -106,6 +131,12 @@ function draw() {
   if (playbackControls.update()) {
     stepPlayback();
   }
+
+  // The sound follows the month's data, and the network breathes with the
+  // data, deepened by how loud the sound is.
+  audioReactive.update();
+  fabricBreath.update(tripData.getNetworkRatio(monthIndex), audioReactive.getLevel());
+  audioReactive.followData(fabricBreath.getBusyness());
 
   background(theme.getBackground(255));
   railNetwork.drawTrackGuides();
@@ -193,7 +224,7 @@ function positionControls() {
   if (width < NARROW_SCREEN_WIDTH) {
     rowMiddle = height - 30;
   }
-  playbackControls.soundButton.position(BUTTON_ROW_LEFT, rowMiddle - 20);
+  audioReactive.button.position(BUTTON_ROW_LEFT, rowMiddle - 20);
   playbackControls.playButton.position(BUTTON_ROW_LEFT + 50, rowMiddle - 24);
   theme.button.position(BUTTON_ROW_LEFT + 108, rowMiddle - 22);
 }
@@ -218,8 +249,8 @@ function toggleTheme() {
   theme.toggle();
 }
 
-function toggleSound() {
-  playbackControls.toggleMuted();
+function toggleAudio() {
+  audioReactive.toggleMute(pageHeader);
 }
 
 // Play from where the artwork is. At the last month, play starts again
@@ -251,8 +282,13 @@ function stepPlayback() {
 
 // Shows a month. The streams ease to its density in drawStreams(), and the
 // timeline and data panel read monthIndex when they draw.
+// A new month also plays the departure-board "clack".
 function setMonth(newMonthIndex) {
+  let previousMonthIndex = monthIndex;
   monthIndex = constrain(newMonthIndex, 0, tripData.getMonthCount() - 1);
+  if (monthIndex !== previousMonthIndex && audioReactive !== undefined) {
+    audioReactive.playFlip();
+  }
 }
 
 // Back to the first month, paused.

@@ -81,13 +81,14 @@ canvas {
 }
 
 /* The round sound and play buttons beside the theme switch (made in
-   utils/playback-controls.js and placed by sketch.js). */
-#sound-control {
+   mechanics/audio-reactive.js and utils/playback-controls.js, and placed
+   by sketch.js). */
+#audio-control {
   width: 40px;
   height: 40px;
 }
 
-#sound-control svg {
+#audio-control svg {
   width: 18px;
   height: 18px;
 }
@@ -230,7 +231,7 @@ canvas {
 
 /* ---------- Dark theme (default) ---------- */
 
-#sound-control,
+#audio-control,
 #theme-control {
   border: 1px solid rgba(242, 239, 230, 0.6);
   background: rgba(14, 17, 26, 0.6);
@@ -266,7 +267,7 @@ canvas {
 /* Hover effects only on devices with a real mouse. On phones a tapped
    button would otherwise stay in its hover colour until you tap elsewhere. */
 @media (hover: hover) {
-  #sound-control:hover,
+  #audio-control:hover,
   #theme-control:hover {
     border-color: #f2efe6;
     background: rgba(242, 239, 230, 0.12);
@@ -284,7 +285,7 @@ body.light {
   background: #f8f5ec;
 }
 
-body.light #sound-control,
+body.light #audio-control,
 body.light #theme-control {
   border-color: rgba(23, 26, 34, 0.6);
   background: rgba(248, 245, 236, 0.6);
@@ -328,7 +329,7 @@ body.light .commuter-control:focus-visible {
 }
 
 @media (hover: hover) {
-  body.light #sound-control:hover,
+  body.light #audio-control:hover,
   body.light #theme-control:hover {
     border-color: #171a22;
     background: rgba(23, 26, 34, 0.08);

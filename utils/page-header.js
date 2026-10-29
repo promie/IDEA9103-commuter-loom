@@ -34,6 +34,11 @@ class PageHeader {
     this.showPlaying(false);
   }
 
+  // Shows a message in the status line, e.g. from the sound button.
+  setStatus(message) {
+    this.status.textContent = message;
+  }
+
   showPlaying(isPlaying) {
     if (isPlaying) {
       this.status.textContent = "Weaving through the months. Press space or drag the timeline to explore.";
