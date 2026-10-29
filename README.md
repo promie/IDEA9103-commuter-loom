@@ -2,24 +2,38 @@
 
 *Commuter Loom: Collective Movement Memory* is an original, data-driven p5.js artwork (Option 2 of the IDEA9103 Creative Coding Major Project). Sydney's rail network becomes a living textile: every T1–T9 line is a stream of coloured grains flowing along a schematic map, and ten years of monthly Opal trips decide how dense and fast each stream is. Touch, noise and sound all act on the same grains, and the whole network breathes and tightens with the data.
 
-## Preview
+**Live site:** <https://commuter-loom.pyutasane.com>
 
 ![Commuter Loom playing from late 2019 into the 2020 lockdowns: a line is pulled out and springs back, T4 is selected for listening mode, and the threads gather into the hand](docs/preview.gif)
 
-## Run it
+## Inspiration
 
-**Live site:** <https://commuter-loom.pyutasane.com>
+- **Sonic Cloth** (NYU Shanghai IMA): a textile where touch, sound and fabric work as one connected system. We took that idea of a single shared material reacting to several inputs, not its visual style.
+- **The official Sydney Trains network map**: the composition of horizontal, vertical and 45° coloured lines running side by side.
+- **Jon Reades, *A Week in the Life of London Underground*** (UCL Centre for Advanced Spatial Analysis, 2012): a visualisation of more than 27 million Oyster card taps over one week, in which the city visibly beats with its morning and evening peaks. Reades describes it as showing "the pulse of the city" ([UCL News, 2012](https://www.ucl.ac.uk/news/headlines/2012/jul/underground-movement)). Our tutor suggested it as a reference: <https://www.informationisbeautifulawards.com/showcase/89-a-week-in-the-life-of-london-underground> Our data is monthly rather than per tap, so instead of a daily heartbeat we show ten years of rhythm in our own textile language: the network's breathing and how dense its threads are.
+- **Connected-particle artworks**: dense fields of fine grains where density and flow speed can be read at a glance.
 
-To run it locally, you need [Node.js](https://nodejs.org/). Inside this folder:
+## The data
 
-```bash
-npm i          # install live-server (once)
-npm run dev    # serve the site and open it at http://127.0.0.1:8080
+Both datasets are from Transport for NSW Open Data:
+
+1. **Opal Trips – Train** (monthly trips by line and card type), saved as `data/train.csv`: <https://opendata.transport.nsw.gov.au/data/dataset/opal-trips-train>
+2. **Sydney Train Routes**, saved as `data/sydneytrains.geojson`: <https://opendata.transport.nsw.gov.au/data/dataset/sydney-train-routes>
+
+`script/clean_data.py` turns the raw CSV into `data/monthly_line_trips_full.csv`. It standardises dates to `YYYY-MM`, adds up all card types, and groups historical service names into T1–T9. Run it with `python3 script/clean_data.py`.
+
+How the data drives the artwork:
+
+```text
+Line (T1–T9)            -> one coloured stream (official Transport for NSW colours)
+Route stopping pattern  -> the stream's track (from sydneytrains.geojson route descriptions)
+Line's normal volume    -> how many grains and how wide the band (T1 densest, T7 sparsest)
+This month vs normal    -> share of grains visible, flow speed and brightness
+Network this month      -> depth and speed of the breathing, and the sound mix:
+                           rumble always, hum when fairly busy, taps only when busy
 ```
 
-The page reloads by itself whenever you save a file. (Opening `index.html` directly does not work, because browsers block loading the CSV and sound files from disk.)
-
-## Interaction instructions
+## How to interact
 
 | Do this | What happens |
 |---|---|
@@ -43,14 +57,7 @@ The sound is the city itself, and it follows the data. Three layers play togethe
 
 Click once to turn the sound on, then watch and listen as the network breathes deeply through 2019, goes slack and nearly silent in 2020, and gradually recovers.
 
-## Inspiration
-
-- **Sonic Cloth** (NYU Shanghai IMA): a textile where touch, sound and fabric work as one connected system. We took that idea of a single shared material reacting to several inputs, not its visual style.
-- **The official Sydney Trains network map**: the composition of horizontal, vertical and 45° coloured lines running side by side.
-- **Jon Reades, *A Week in the Life of London Underground*** (UCL Centre for Advanced Spatial Analysis, 2012): a visualisation of more than 27 million Oyster card taps over one week, in which the city visibly beats with its morning and evening peaks. Reades describes it as showing "the pulse of the city" ([UCL News, 2012](https://www.ucl.ac.uk/news/headlines/2012/jul/underground-movement)). Our tutor suggested it as a reference: <https://www.informationisbeautifulawards.com/showcase/89-a-week-in-the-life-of-london-underground> Our data is monthly rather than per tap, so instead of a daily heartbeat we show ten years of rhythm in our own textile language: the network's breathing and how dense its threads are.
-- **Connected-particle artworks**: dense fields of fine grains where density and flow speed can be read at a glance.
-
-## Mechanic ownership
+## The mechanics
 
 | Member | Mechanic | File |
 |---|---|---|
@@ -58,15 +65,44 @@ Click once to turn the sound on, then watch and listen as the network breathes d
 | Wanghao Jin (wjin0936) | Perlin noise and randomness | `mechanics/perlin-flow.js` |
 | Promie Yutasane (pyut8988) | User input | `mechanics/input-controls.js` |
 
-**Perlin noise and randomness (Wanghao).** Each line is a band of thousands of persistent grains, short stitches and small knots, that travel along its track and wrap around at the end. Each grain gets its own random speed, lane, size and shape once, when it is created, so the cloth keeps a stable weave. Perlin noise makes each grain wander sideways from its lane, but only within half the gap to the neighbouring line, so lines never cross into each other. The monthly trip data sets how many grains show, how bright they are and how fast they move, so busy months look like dense, bright rope and quiet months like thin, dim thread. Hovering presses a soft dent into the fabric (`FabricPress`), so the threads part around the pointer.
-
-**User input (Promie).** The visitor's hand on the fabric and their control of time. Holding the mouse (or a finger) gathers grains into the hand, dragging a line pulls that thread out of the network, and the flow speeds up near the hand; each grain then springs back onto its track. Clicking a line enters listening mode. Dragging the woven timeline, clicking a year, the scroll wheel and the arrow keys travel through time and pause playback; Space plays or pauses and R resets. Touch screens get the same controls through the touch events. The grains ask `InputControls` how the hand moves them (`getTouchAmount()`, `applyGather()`, `getPullWeight()`), so all the hand's rules live in one file.
-
-**Audio (Guangshun).** Three layered city sounds (rumble, hum and taps) whose volumes and pitch follow each month's network trips, so a busy month sounds full and the lockdowns sound nearly silent. `p5.FFT` analyses the mix every frame: bass squeezes each band tight onto its track, mids shear neighbouring lines against each other, treble makes the grains shiver, and the overall level deepens the breathing. A departure-board clack plays as each month flips over, and the speaker button mutes the sound without stopping the analysis.
-
 The timed playback (`utils/timeline.js`) and the network's breathing (`utils/fabric-breath.js`) are shared utilities that every mechanic reads from.
 
-## Techniques
+### Perlin noise and randomness · Wanghao
+
+Each line is a band of thousands of persistent grains, short stitches and small knots, that travel along its track and wrap around at the end. Each grain gets its own random speed, lane, size and shape once, when it is created, so the cloth keeps a stable weave. Perlin noise makes each grain wander sideways from its lane, but only within half the gap to the neighbouring line, so lines never cross into each other. The monthly trip data sets how many grains show, how bright they are and how fast they move, so busy months look like dense, bright rope and quiet months like thin, dim thread. Hovering presses a soft dent into the fabric (`FabricPress`), so the threads part around the pointer.
+
+**Try it:** let time play and watch busy months weave dense, bright rope while 2020 thins into broken, dim thread. Hover over a line and the threads part around the pointer.
+
+**How it works:**
+
+- **Persistent grains and controlled randomness** (`mechanics/perlin-flow.js`): grains are created once per resize with `random()` and never re-rolled. Each grain has a random `showThreshold`; a month shows the grains whose threshold falls under its trip share, so changing month fades grains in and out instead of rebuilding the stream.
+- **Perlin noise drift**: `noise(position along track, time, grain offset)` pushes each grain along the track's normal. The drift limit is worked out from `LANE_GAP_UNITS`, so it scales with the map on resize.
+- **Data-driven density**: `TripData.getTripRatio()` (each line's month compared with its own average) sets the visible share, speed and brightness. `getLineVolume()` sets how thick each line's band is overall. Changes ease in with `lerp()`.
+- **Fabric press**: the push is the derivative of a Gaussian across the track (zero at the pointer, strongest about one grid unit away, fading to nothing), times a Gaussian along the track. It only moves where grains are drawn, never the route data.
+- **Fast drawing**: knots and stitches are added to a single canvas path and filled once per line through `drawingContext`, which keeps thousands of marks at about 60 fps. If the frame rate drops below 40 about 3 seconds in, the sketch switches to `pixelDensity(1)`.
+
+### Audio · Guangshun
+
+Three layered city sounds (rumble, hum and taps) whose volumes and pitch follow each month's network trips, so a busy month sounds full and the lockdowns sound nearly silent. `p5.FFT` analyses the mix every frame: bass squeezes each band tight onto its track, mids shear neighbouring lines against each other, treble makes the grains shiver, and the overall level deepens the breathing. A departure-board clack plays as each month flips over, and the speaker button mutes the sound without stopping the analysis.
+
+**Try it:** click once to start the sound, then drag the timeline into 2020 and hear the taps and then the hum fade until only the rumble is left. Mute it and the fabric keeps moving with the sound.
+
+**How it works:**
+
+- **Sound analysis**: `p5.FFT` with `getEnergy()` for bass, mid and treble, and `outputVolume()` for loudness. The analysis keeps running while muted, so the fabric still moves.
+
+### User input · Promie
+
+The visitor's hand on the fabric and their control of time. Holding the mouse (or a finger) gathers grains into the hand, dragging a line pulls that thread out of the network, and the flow speeds up near the hand; each grain then springs back onto its track. Clicking a line enters listening mode. Dragging the woven timeline, clicking a year, the scroll wheel and the arrow keys travel through time and pause playback; Space plays or pauses and R resets. Touch screens get the same controls through the touch events. The grains ask `InputControls` how the hand moves them (`getTouchAmount()`, `applyGather()`, `getPullWeight()`), so all the hand's rules live in one file.
+
+**Try it:** press and hold to gather the threads, drag a line to pull it out and let it spring back, click a line to listen to it, and drag the timeline or use the arrow keys to travel through time.
+
+**How it works:**
+
+- **The hand**: gathering pulls each grain towards the pointer with a strength that fades with distance. A pull finds where the line was grabbed on each branch (`RailNetwork.findGrabbedDistances()`) and moves grains by a Gaussian weight of their distance from that point, so the line bends like a pulled thread. A damped spring (The Nature of Code) brings everything back.
+- **Phones and tablets**: `touchStarted()`, `touchMoved()` and `touchEnded()` send touches to the same `InputControls` methods as the mouse, and return `false` so taps are not counted twice. Smaller screens get a compact layout and a data card above the dock, and `windowResized()` rebuilds the map and refills the grains.
+
+## How it's built
 
 ### Code structure
 
@@ -89,38 +125,16 @@ Each part of the artwork is a class in its own file, and each mechanic lives in 
 
 Everything on the map is clipped above the control dock with `beginClip()`, so the lines end exactly at the dock.
 
-### Data mapping
+### Shared techniques
 
-```text
-Line (T1–T9)            -> one coloured stream (official Transport for NSW colours)
-Route stopping pattern  -> the stream's track (from sydneytrains.geojson route descriptions)
-Line's normal volume    -> how many grains and how wide the band (T1 densest, T7 sparsest)
-This month vs normal    -> share of grains visible, flow speed and brightness
-Network this month      -> depth and speed of the breathing, and the sound mix:
-                           rumble always, hum when fairly busy, taps only when busy
-```
-
-### Key techniques
-
-- **Persistent grains and controlled randomness** (`mechanics/perlin-flow.js`): grains are created once per resize with `random()` and never re-rolled. Each grain has a random `showThreshold`; a month shows the grains whose threshold falls under its trip share, so changing month fades grains in and out instead of rebuilding the stream.
-- **Perlin noise drift**: `noise(position along track, time, grain offset)` pushes each grain along the track's normal. The drift limit is worked out from `LANE_GAP_UNITS`, so it scales with the map on resize.
-- **Data-driven density**: `TripData.getTripRatio()` (each line's month compared with its own average) sets the visible share, speed and brightness. `getLineVolume()` sets how thick each line's band is overall. Changes ease in with `lerp()`.
-- **Fabric press**: the push is the derivative of a Gaussian across the track (zero at the pointer, strongest about one grid unit away, fading to nothing), times a Gaussian along the track. It only moves where grains are drawn, never the route data.
-- **The hand**: gathering pulls each grain towards the pointer with a strength that fades with distance. A pull finds where the line was grabbed on each branch (`RailNetwork.findGrabbedDistances()`) and moves grains by a Gaussian weight of their distance from that point, so the line bends like a pulled thread. A damped spring (The Nature of Code) brings everything back.
-- **Sound analysis**: `p5.FFT` with `getEnergy()` for bass, mid and treble, and `outputVolume()` for loudness. The analysis keeps running while muted, so the fabric still moves.
 - **Breathing**: a `deltaTime` timer and `sin()` give a swell and release whose depth and speed follow the month's trips.
 - **Rounded tracks**: Chaikin's corner cutting smooths the schematic corners.
-- **Fast drawing**: knots and stitches are added to a single canvas path and filled once per line through `drawingContext`, which keeps thousands of marks at about 60 fps. If the frame rate drops below 40 about 3 seconds in, the sketch switches to `pixelDensity(1)`.
-- **Phones and tablets**: `touchStarted()`, `touchMoved()` and `touchEnded()` send touches to the same `InputControls` methods as the mouse, and return `false` so taps are not counted twice. Smaller screens get a compact layout and a data card above the dock, and `windowResized()` rebuilds the map and refills the grains.
 
-## Data
+## Known limitations
 
-Both datasets are from Transport for NSW Open Data:
-
-1. **Opal Trips – Train** (monthly trips by line and card type), saved as `data/train.csv`: <https://opendata.transport.nsw.gov.au/data/dataset/opal-trips-train>
-2. **Sydney Train Routes**, saved as `data/sydneytrains.geojson`: <https://opendata.transport.nsw.gov.au/data/dataset/sydney-train-routes>
-
-`script/clean_data.py` turns the raw CSV into `data/monthly_line_trips_full.csv`. It standardises dates to `YYYY-MM`, adds up all card types, and groups historical service names into T1–T9. Run it with `python3 script/clean_data.py`.
+- **Station busyness is a placeholder.** The station `tier` values in `utils/network-layout.js` are a rough ranking. They should be replaced with the Transport for NSW *Train Station Entries and Exits* dataset.
+- **Positions are schematic.** Stopping patterns follow the current routes, but stations are hand-placed. T2 Leppington runs via Harris Park and T3 Bankstown via Regents Park for simplicity.
+- The trip data uses historical line families, while the map shows today's routes (for example, T9 has no trips before it was introduced).
 
 ## AI acknowledgement
 
@@ -139,8 +153,13 @@ All three of us used Claude (Anthropic) while building this project. Every file 
 - Canvas 2D path drawing via `drawingContext`: [MDN CanvasRenderingContext2D](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D)
 - p5.js [`noise()`](https://p5js.org/reference/p5/noise/), [`random()`](https://p5js.org/reference/p5/random/) and [`p5.FFT`](https://p5js.org/reference/p5.sound/p5.FFT/)
 
-## Known limitations
+## Run it locally
 
-- **Station busyness is a placeholder.** The station `tier` values in `utils/network-layout.js` are a rough ranking. They should be replaced with the Transport for NSW *Train Station Entries and Exits* dataset.
-- **Positions are schematic.** Stopping patterns follow the current routes, but stations are hand-placed. T2 Leppington runs via Harris Park and T3 Bankstown via Regents Park for simplicity.
-- The trip data uses historical line families, while the map shows today's routes (for example, T9 has no trips before it was introduced).
+To run it locally, you need [Node.js](https://nodejs.org/). Inside this folder:
+
+```bash
+npm i          # install live-server (once)
+npm run dev    # serve the site and open it at http://127.0.0.1:8080
+```
+
+The page reloads by itself whenever you save a file. (Opening `index.html` directly does not work, because browsers block loading the CSV and sound files from disk.)
