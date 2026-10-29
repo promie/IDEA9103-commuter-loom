@@ -29,6 +29,14 @@ let lineStreams = [];
 // Fallback: set to true to draw the old solid tracks instead of the grains.
 const SHOW_SOLID_TRACKS = false;
 
+// Temporary, until there is a timeline: which month the artwork shows.
+// null shows the latest month in the data. To test another month, put its
+// number here: 0 = July 2016, 1 = August 2016, ... 45 = April 2020,
+// ... 121 = August 2026. The month shown is printed in the browser console.
+const TEST_MONTH_INDEX = null;
+// The month the grains show, worked out in setup().
+let monthIndex = 0;
+
 // Heavy files are loaded before setup() runs, so they are ready to use.
 function preload() {
   tripTable = loadTable(DATA_PATH, "csv", "header");
@@ -45,8 +53,15 @@ function setup() {
   railNetwork = new RailNetwork(STATIONS, LINE_ROUTES, LANE_ORDER, theme);
   fitMap();
 
+  if (TEST_MONTH_INDEX === null) {
+    monthIndex = tripData.getMonthCount() - 1;
+  } else {
+    monthIndex = constrain(TEST_MONTH_INDEX, 0, tripData.getMonthCount() - 1);
+  }
+  console.log("Commuter Loom is showing " + tripData.months[monthIndex] + " (month index " + monthIndex + ")");
+
   for (let lineName of LINE_NAMES) {
-    lineStreams.push(new LineStream(lineName));
+    lineStreams.push(new LineStream(lineName, tripData));
   }
   fillStreams();
 
@@ -101,12 +116,13 @@ function fillStreams() {
   }
 }
 
-// Moves and draws every line's grains. In listening mode the selected
-// line is drawn last (on top) and the others fade back, as the solid
-// tracks below did.
+// Moves and draws every line's grains, with the density and speed of the
+// month shown. In listening mode the selected line is drawn last (on top)
+// and the others fade back, as the solid tracks below did.
 function drawStreams(selectedLineName) {
   let selectedStream = null;
   for (let stream of lineStreams) {
+    stream.setMonth(monthIndex);
     stream.update();
     if (stream.lineName === selectedLineName) {
       selectedStream = stream;

@@ -22,6 +22,12 @@
 // Random values give each grain its own fixed character; Perlin noise gives
 // the whole stream its smooth, ever-changing movement.
 //
+// The real Opal trip data (TripData) decides how many grains each line
+// shows and how fast its stream flows: busier lines and busier months are
+// denser and quicker, quiet months thin out into broken, slower threads.
+// So the three jobs stay separate: the data sets how much is moving,
+// random() sets each grain's character, and noise() sets how it sways.
+//
 // Sizes, spacing and speeds are measured in grid units (railNetwork.gridUnit)
 // instead of pixels, so the textile looks the same on a phone and on a big
 // screen.
@@ -29,12 +35,14 @@
 // AI acknowledgement: this file was written with the help of Claude
 // (Anthropic). It moves each grain along a TrackPath with the path's own
 // findSegmentIndex() and getPositionAt() methods, uses p5's random() to
-// give every grain its individual properties, and p5's noise() for the
-// sideways drift.
+// give every grain its individual properties, p5's noise() for the
+// sideways drift, and TripData's getLineVolume() and getTripRatio() for
+// the density and speed.
 
-// Average gap between neighbouring grains along a track, in grid units.
-// Smaller numbers make denser (and slower to draw) streams.
-const FLOW_GRAIN_SPACING_UNITS = 0.12;
+// Average gap between neighbouring grains along a track, in grid units,
+// for the busiest line in a normal month. Smaller numbers make denser (and
+// slower to draw) streams.
+const FLOW_GRAIN_SPACING_UNITS = 0.1;
 
 // A safety limit so a very long branch can never create too many grains.
 const FLOW_MAX_GRAINS_PER_PATH = 900;
@@ -90,6 +98,28 @@ const FLOW_NOISE_GRAIN_SPREAD = 0.6;
 const FLOW_NOISE_LOW = 0.25;
 const FLOW_NOISE_HIGH = 0.75;
 
+// ---- Trip data: density and speed ----
+
+// How dense the quietest line (T7) is in a normal month, compared with the
+// busiest line (T1). Taken from TripData.getLineVolume(), which compares the
+// lines on a log scale, so small lines stay visible next to T1.
+const FLOW_QUIETEST_LINE_DENSITY = 0.45;
+
+// Each line keeps enough grains for its busiest month on record. This caps
+// that, in case one unusual month is far above the line's average.
+const FLOW_MAX_PEAK_TRIP_RATIO = 2;
+
+// Speed follows the line's trip ratio for the month (1 = a normal month):
+// a month with no trips would flow at 60% of normal speed, a normal month
+// at full speed, and nothing ever flows faster than 120%.
+const FLOW_QUIET_SPEED_SCALE = 0.6;
+const FLOW_BUSY_SPEED_SCALE = 1.2;
+
+// How quickly density and speed catch up with a new month (the share of
+// the remaining difference covered each frame). Small numbers mean grains
+// appear and disappear gradually over about a second, not all at once.
+const FLOW_DATA_EASING = 0.05;
+
 // One particle on one branch of a line.
 class Grain {
   constructor(path) {
@@ -109,6 +139,11 @@ class Grain {
     // Its own position in the noise, so its drift is a little different
     // from the grains around it.
     this.noiseOffset = random(0, FLOW_NOISE_GRAIN_SPREAD);
+    // Its place in the queue to be shown, from 0 to 1. A grain is visible
+    // while the month's density is above this number, so in a quiet month
+    // only the grains with the lowest numbers show. The busier the month,
+    // the more grains join in, and the same grains always show first.
+    this.showThreshold = random(0, 1);
 
     // Which pair of track points the grain is between. Remembering it means
     // the path only has to search a step or two each frame.
@@ -174,10 +209,29 @@ class Grain {
 }
 
 // All the grains of one train line, across all of its branches.
+// tripData is the project's TripData object (utils/trip-data.js).
 class LineStream {
-  constructor(lineName) {
+  constructor(lineName, tripData) {
     this.lineName = lineName;
+    this.tripData = tripData;
     this.grains = [];
+
+    // How dense this line is in a normal month compared with the busiest
+    // line: from FLOW_QUIETEST_LINE_DENSITY (T7) up to 1 (T1).
+    this.lineDensity = map(tripData.getLineVolume(lineName), 0, 1, FLOW_QUIETEST_LINE_DENSITY, 1);
+
+    // This line's busiest month compared with its normal month. The line
+    // gets enough grains for that month, and fewer are shown in quieter ones.
+    this.peakTripRatio = this.findPeakTripRatio();
+
+    // The share of grains shown (0 to 1) and the speed scale, for the month
+    // shown. "target" values are set by setMonth(); the others ease towards
+    // them in update(). Starting at 0 means the streams weave themselves
+    // in when the page opens.
+    this.visibleShare = 0;
+    this.targetVisibleShare = 0;
+    this.speedScale = 1;
+    this.targetSpeedScale = 1;
 
     // Pixels per grid unit, copied from the rail network in fillWithGrains().
     this.gridUnit = 1;
@@ -207,9 +261,11 @@ class LineStream {
     for (let path of paths) {
       // Longer tracks get more grains. particleShare gives each branch of a
       // two-branch line a share of the grains, so the trunk they share
-      // ends up busiest.
+      // ends up busiest. Busier lines get more grains per unit of track,
+      // and every line gets enough for its busiest month.
       let lengthInUnits = path.totalLength / gridUnit;
-      let grainCount = floor((lengthInUnits * path.particleShare) / FLOW_GRAIN_SPACING_UNITS);
+      let normalMonthCount = (lengthInUnits * path.particleShare * this.lineDensity) / FLOW_GRAIN_SPACING_UNITS;
+      let grainCount = floor(normalMonthCount * this.peakTripRatio);
       grainCount = min(grainCount, FLOW_MAX_GRAINS_PER_PATH);
       for (let i = 0; i < grainCount; i++) {
         this.grains.push(new Grain(path));
@@ -217,12 +273,49 @@ class LineStream {
     }
   }
 
+  // The largest getTripRatio() of any month in the data, i.e. how much
+  // busier than normal this line's busiest month was. Worked out once.
+  findPeakTripRatio() {
+    let peak = 1;
+    for (let monthIndex = 0; monthIndex < this.tripData.getMonthCount(); monthIndex++) {
+      peak = max(peak, this.tripData.getTripRatio(this.lineName, monthIndex));
+    }
+    return min(peak, FLOW_MAX_PEAK_TRIP_RATIO);
+  }
+
+  // Reads the month's trips for this line and sets the density and speed
+  // to move towards. tripRatio is this month compared with the line's own
+  // normal month, so a quiet month thins every line by the same proportion.
+  setMonth(monthIndex) {
+    let tripRatio = this.tripData.getTripRatio(this.lineName, monthIndex);
+
+    // Shown grains are in proportion to trips: half the trips of the
+    // busiest month shows half of the grains.
+    this.targetVisibleShare = constrain(tripRatio / this.peakTripRatio, 0, 1);
+
+    // Busier months flow a little faster, quieter months more slowly.
+    // This scales every grain's own random speed by the same amount, so
+    // fast grains stay faster than slow ones.
+    this.targetSpeedScale = constrain(
+      map(tripRatio, 0, 1, FLOW_QUIET_SPEED_SCALE, 1),
+      FLOW_QUIET_SPEED_SCALE,
+      FLOW_BUSY_SPEED_SCALE
+    );
+  }
+
   // Moves every grain one step along its track, and moves the noise on in
   // time. millis() means the ripples change at the same pace however fast
   // the computer draws frames.
   update() {
+    // Ease towards the month's density and speed, so a change of month
+    // fades in and out instead of jumping.
+    this.visibleShare = lerp(this.visibleShare, this.targetVisibleShare, FLOW_DATA_EASING);
+    this.speedScale = lerp(this.speedScale, this.targetSpeedScale, FLOW_DATA_EASING);
+
     this.noiseTime = (millis() / 1000) * FLOW_NOISE_TIME_SPEED;
-    let stepPixels = FLOW_BASE_SPEED_UNITS * this.gridUnit;
+    let stepPixels = FLOW_BASE_SPEED_UNITS * this.gridUnit * this.speedScale;
+    // Hidden grains keep moving too, so when a busier month brings them
+    // back they are already spread along the track.
     for (let grain of this.grains) {
       grain.move(stepPixels);
     }
@@ -236,7 +329,10 @@ class LineStream {
     // Squares are drawn centred on the grain's position.
     rectMode(CENTER);
     for (let grain of this.grains) {
-      grain.draw(this);
+      // Only the month's share of grains is shown (see showThreshold).
+      if (grain.showThreshold < this.visibleShare) {
+        grain.draw(this);
+      }
     }
     pop();
   }
