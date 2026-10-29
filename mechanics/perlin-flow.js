@@ -39,6 +39,11 @@
 // settle together). In listening mode the selected line widens and speeds
 // up while the others narrow, slow and fade back.
 //
+// The city sound (mechanics/audio-reactive.js) moves the grains too,
+// through frame.audio: bass squeezes each band tight onto its track, mids
+// shear neighbouring lines sideways against each other, and treble makes
+// the grains shiver. The line being listened to reacts most strongly.
+//
 // Sizes, spacing and speeds are measured in grid units (railNetwork.gridUnit)
 // instead of pixels, so the textile looks the same on a phone and on a big
 // screen.
@@ -169,6 +174,21 @@ const FLOW_PULSE_GROWTH = 0.6;
 const FLOW_BREATH_SURGE = 0.5;
 const FLOW_BREATH_GROWTH = 0.35;
 
+// ---- Sound ----
+
+// How strongly the sound moves each line: the selected line in listening
+// mode reacts most, the faded lines least.
+const FLOW_SELECTED_AUDIO = 1.8;
+const FLOW_FADED_AUDIO = 0.35;
+
+// How tightly the loudest bass squeezes a band (0.6 = to 40% of its width).
+const FLOW_BASS_SQUEEZE = 0.6;
+
+// The shear is a slow sideways wave along each track: how tightly packed
+// its ripples are (per pixel along the track) and how fast they travel.
+const FLOW_SHEAR_RIPPLE = 0.012;
+const FLOW_SHEAR_SPEED = 3;
+
 // ---- Pointer press ----
 
 // The dent's size, in grid units: how far it reaches across the track
@@ -297,6 +317,13 @@ class Grain {
     let x = position.x + normalX * sideways;
     let y = position.y + normalY * sideways;
 
+    // Then by the sound: the mid-frequency shear (a sideways wave moving
+    // along the track) and the treble shiver (a tiny random jitter).
+    let shear = sin(this.distance * FLOW_SHEAR_RIPPLE - stream.shearPhase) * stream.shearAmount;
+    let shiver = random(-0.5, 0.5) * stream.shiverAmount;
+    x += normalX * (shear + shiver);
+    y += normalY * (shear + shiver);
+
     // Then by the pointer's press, eased so the thread gives way and
     // recovers softly instead of snapping.
     let pressTarget = press.getPush(x, y, normalX, normalY, stream);
@@ -359,15 +386,33 @@ class LineStream {
     this.focusWidth = 1;
     this.focusSpeed = 1;
     this.focusOpacity = 1;
+    this.focusAudio = 1;
     this.targetFocusWidth = 1;
     this.targetFocusSpeed = 1;
     this.targetFocusOpacity = 1;
+    this.targetFocusAudio = 1;
+
+    // Neighbouring lines shear in opposite directions to the mid
+    // frequencies: odd-numbered lines (T1, T3...) one way, even the other.
+    // int() turns the "1" of "T1" into the number 1.
+    if (int(lineName.substring(1)) % 2 === 1) {
+      this.shearDirection = 1;
+    } else {
+      this.shearDirection = -1;
+    }
 
     // Set each frame in update(): the band's half width after listening
     // mode and the breath, and how much the month's pulse and the breath
     // enlarge every grain.
     this.currentBandHalfWidth = 0;
     this.sizeBoost = 1;
+
+    // Set each frame in update() from the sound: how far (in pixels) the
+    // mids shear the band and the treble shivers it, and where the shear
+    // wave has travelled to.
+    this.shearAmount = 0;
+    this.shearPhase = 0;
+    this.shiverAmount = 0;
 
     // Where this line's ripples start in the noise, chosen at random once,
     // so every line swings in its own pattern instead of all in step.
@@ -443,13 +488,16 @@ class LineStream {
     this.targetFocusWidth = 1;
     this.targetFocusSpeed = 1;
     this.targetFocusOpacity = 1;
+    this.targetFocusAudio = 1;
     if (selectedLineName === this.lineName) {
       this.targetFocusWidth = FLOW_SELECTED_WIDTH;
       this.targetFocusSpeed = FLOW_SELECTED_SPEED;
+      this.targetFocusAudio = FLOW_SELECTED_AUDIO;
     } else if (selectedLineName !== null) {
       this.targetFocusWidth = FLOW_FADED_WIDTH;
       this.targetFocusSpeed = FLOW_FADED_SPEED;
       this.targetFocusOpacity = FLOW_FADED_OPACITY;
+      this.targetFocusAudio = FLOW_FADED_AUDIO;
     }
   }
 
@@ -457,7 +505,8 @@ class LineStream {
   // time. millis() means the ripples change at the same pace however fast
   // the computer draws frames. frame comes from sketch.js: frame.pulse
   // (0-1) is the month change, frame.breathSwell the network's breath
-  // (about -0.6 to 0.6).
+  // (about -0.6 to 0.6), frame.audio the AudioReactive object and
+  // frame.time a clock that moves on 0.01 each frame.
   update(frame) {
     // Ease towards the month's density, speed and brightness, so a change
     // of month fades in and out instead of jumping.
@@ -467,10 +516,18 @@ class LineStream {
     this.focusWidth = lerp(this.focusWidth, this.targetFocusWidth, FLOW_FOCUS_EASING);
     this.focusSpeed = lerp(this.focusSpeed, this.targetFocusSpeed, FLOW_FOCUS_EASING);
     this.focusOpacity = lerp(this.focusOpacity, this.targetFocusOpacity, FLOW_FOCUS_EASING);
+    this.focusAudio = lerp(this.focusAudio, this.targetFocusAudio, FLOW_FOCUS_EASING);
 
     // The breath widens the band and surges the flow; the pulse and the
     // breath both enlarge the grains.
     this.currentBandHalfWidth = this.bandHalfWidth * this.focusWidth * (1 + frame.breathSwell);
+
+    // The sound: bass squeezes the band, mids shear it, treble shivers it.
+    let audio = frame.audio;
+    this.currentBandHalfWidth *= 1 - audio.getBassSqueeze() * FLOW_BASS_SQUEEZE * this.focusAudio;
+    this.shearAmount = audio.getMidShear() * this.shearDirection * this.focusAudio;
+    this.shearPhase = frame.time * FLOW_SHEAR_SPEED;
+    this.shiverAmount = audio.getTrebleShiver() * this.focusAudio;
     this.sizeBoost = (1 + frame.pulse * FLOW_PULSE_GROWTH) * (1 + frame.breathSwell * FLOW_BREATH_GROWTH);
 
     this.noiseTime = (millis() / 1000) * FLOW_NOISE_TIME_SPEED;

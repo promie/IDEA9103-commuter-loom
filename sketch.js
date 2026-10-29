@@ -166,13 +166,16 @@ function fillStreams() {
 
 // Moves and draws every line's grains, with the density, speed and
 // brightness of the month shown. The frame object carries what the grains
-// react to: the pointer's press, the month's pulse and the network's
-// breath. In listening mode the selected line is drawn last (on top).
+// react to: the pointer's press, the month's pulse, the network's breath
+// and the city sound. In listening mode the selected line is drawn last
+// (on top).
 function drawStreams(selectedLineName) {
   let frame = {
     press: fabricPress,
     pulse: timeline.pulse,
     breathSwell: fabricBreath.getSwell(),
+    audio: audioReactive,
+    time: frameCount * 0.01,
   };
   let selectedStream = null;
   for (let stream of lineStreams) {
