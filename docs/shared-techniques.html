@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shared techniques</title>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0e111a; display: flex; justify-content: center; padding: 2rem; }
+    .diagram-container { width: 100%; max-width: 1200px; overflow-x: auto; }
+    svg { width: 100%; min-width: 1200px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="diagram-container">
+    <svg viewBox="0 0 1200 324" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="shared-techniques-title shared-techniques-desc">
+      <title id="shared-techniques-title">Shared techniques</title>
+      <desc id="shared-techniques-desc">Breathing with a deltaTime timer and sin(); rounded tracks with Chaikin's corner cutting; the map clipped above the control dock with beginClip().</desc>
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#a3a9b8"/></marker>
+        <marker id="arrow-amber" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#e8a75e"/></marker>
+      </defs>
+<rect width="1200" height="400" fill="#0e111a"/>
+<text x="40" y="34" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10.5" letter-spacing="1.6" fill="#8d93a1">SHARED TECHNIQUES</text>
+<rect x="40" y="50" width="360" height="250" rx="8" fill="#151925" stroke="rgba(242,239,230,0.12)"/>
+<rect x="40" y="50" width="360" height="120" rx="8" fill="#10131c"/>
+<rect x="40" y="162" width="360" height="8" fill="#10131c"/>
+<polyline points="64,116.0 67,114.2 70,112.3 73,110.5 76,108.7 79,106.9 82,105.1 85,103.4 88,101.9 91,100.4 94,99.1 97,97.9 100,96.8 103,96.0 106,95.3 109,94.8 112,94.6 115,94.5 118,94.7 121,95.1 124,95.7 127,96.6 130,97.6 133,98.9 136,100.4 139,102.0 142,103.8 145,105.8 148,108.0 151,110.2 154,112.6 157,115.0 160,117.5 163,120.0 166,122.5 169,124.9 172,127.4 175,129.7 178,132.0 181,134.1 184,136.1 187,137.9 190,139.5 193,140.9 196,142.1 199,143.0 202,143.7 205,144.1 208,144.2 211,144.0 214,143.5 217,142.8 220,141.7 223,140.4 226,138.9 229,137.0 232,134.9 235,132.6 238,130.1 241,127.5 244,124.6 247,121.7 250,118.6 253,115.5 256,112.3 259,109.1 262,106.0 265,102.9 268,99.9 271,97.0 274,94.3 277,91.8 280,89.5 283,87.4 286,85.6 289,84.0 292,82.8 295,81.9 298,81.3 301,81.1 304,81.2 307,81.7 310,82.5 313,83.7 316,85.2 319,87.1 322,89.2 325,91.7 328,94.4 331,97.4 334,100.6 337,104.0 340,107.6 343,111.3 346,115.1 349,118.9 352,122.7 355,126.5 358,130.3 361,133.9 364,137.4 367,140.8 370,143.9 373,146.8" fill="none" stroke="#e8a75e" stroke-width="2"/>
+<circle cx="111" cy="94.6" r="6" fill="#e8a75e" opacity="0.35"/>
+<circle cx="205" cy="144.1" r="9" fill="#e8a75e" opacity="0.35"/>
+<circle cx="299" cy="81.2" r="12" fill="#e8a75e" opacity="0.35"/>
+<text x="64" y="164" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="9.5" letter-spacing="0" fill="#8d93a1">quiet month</text>
+<text x="376" y="164" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="9.5" letter-spacing="0" fill="#e8a75e">busy month</text>
+<text x="58" y="198" text-anchor="start" font-family="Raleway, sans-serif" font-weight="700" font-size="15" letter-spacing="0" fill="#f2efe6">Breathing</text>
+<text x="58" y="220" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="12.5" letter-spacing="0" fill="#a3a9b8">A deltaTime timer and sin() swell and release the</text>
+<text x="58" y="237" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="12.5" letter-spacing="0" fill="#a3a9b8">whole network. Busy months breathe deeper and</text>
+<text x="58" y="254" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="12.5" letter-spacing="0" fill="#a3a9b8">faster.</text>
+<text x="58" y="284" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="11" letter-spacing="0" fill="#e8a75e">deltaTime · sin()</text>
+<rect x="420" y="50" width="360" height="250" rx="8" fill="#151925" stroke="rgba(242,239,230,0.12)"/>
+<rect x="420" y="50" width="360" height="120" rx="8" fill="#10131c"/>
+<rect x="420" y="162" width="360" height="8" fill="#10131c"/>
+<polyline points="464,156 564,156 614,106 734,106" fill="none" stroke="#a3a9b8" stroke-width="1.4" stroke-dasharray="4 4"/>
+<path d="M464,156 H544 C569,156 579,146 589,132 S609,106 634,106 H734" fill="none" stroke="#25A9D1" stroke-width="4" stroke-linecap="round"/>
+<circle cx="564" cy="156" r="4" fill="none" stroke="#a3a9b8" stroke-width="1.4"/>
+<circle cx="614" cy="106" r="4" fill="none" stroke="#a3a9b8" stroke-width="1.4"/>
+<text x="744" y="164" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="9.5" letter-spacing="0" fill="#8d93a1">sharp → smooth</text>
+<text x="438" y="198" text-anchor="start" font-family="Raleway, sans-serif" font-weight="700" font-size="15" letter-spacing="0" fill="#f2efe6">Rounded tracks</text>
+<text x="438" y="220" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="12.5" letter-spacing="0" fill="#a3a9b8">Chaikin's corner cutting turns the schematic's sharp</text>
+<text x="438" y="237" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="12.5" letter-spacing="0" fill="#a3a9b8">corners into smooth curves.</text>
+<text x="438" y="284" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="11" letter-spacing="0" fill="#e8a75e">RailNetwork.smoothCorners()</text>
+<rect x="800" y="50" width="360" height="250" rx="8" fill="#151925" stroke="rgba(242,239,230,0.12)"/>
+<rect x="800" y="50" width="360" height="120" rx="8" fill="#10131c"/>
+<rect x="800" y="162" width="360" height="8" fill="#10131c"/>
+<path d="M824,80 H1136" stroke="#F5A93F" stroke-width="3" stroke-dasharray="7 5" stroke-linecap="round"/>
+<path d="M824,96 H1136" stroke="#25A9D1" stroke-width="3" stroke-dasharray="7 5" stroke-linecap="round"/>
+<path d="M824,112 H1136" stroke="#DC3A9F" stroke-width="3" stroke-dasharray="7 5" stroke-linecap="round"/>
+<path d="M824,128 H1136" stroke="#14B866" stroke-width="3" stroke-dasharray="7 5" stroke-linecap="round"/>
+<line x1="816" y1="142" x2="1144" y2="142" stroke="#e8a75e" stroke-width="1.4" stroke-dasharray="4 3"/>
+<rect x="816" y="146" width="328" height="22" rx="4" fill="#222838"/>
+<text x="824" y="161" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#a3a9b8">control dock</text>
+<text x="818" y="198" text-anchor="start" font-family="Raleway, sans-serif" font-weight="700" font-size="15" letter-spacing="0" fill="#f2efe6">Clipped above the dock</text>
+<text x="818" y="220" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="12.5" letter-spacing="0" fill="#a3a9b8">Everything on the map is clipped, so the lines end</text>
+<text x="818" y="237" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="12.5" letter-spacing="0" fill="#a3a9b8">exactly where the controls begin.</text>
+<text x="818" y="284" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="11" letter-spacing="0" fill="#e8a75e">beginClip() · endClip()</text>
+    </svg>
+  </div>
+</body>
+</html>

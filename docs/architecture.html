@@ -8,15 +8,15 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #0e111a; color: #f2efe6; font-family: Raleway, sans-serif; display: flex; justify-content: center; padding: 2rem; }
-    .diagram-container { width: 100%; max-width: 1720px; overflow-x: auto; }
-    svg { width: 100%; min-width: 1720px; display: block; }
+    .diagram-container { width: 100%; max-width: 1000px; overflow-x: auto; }
+    svg { width: 100%; min-width: 1000px; display: block; }
   </style>
 </head>
 <body>
   <div class="diagram-container">
-    <svg viewBox="0 0 1720 1208" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="architecture-title architecture-desc">
+    <svg viewBox="0 0 1000 2123" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="architecture-title architecture-desc">
       <title id="architecture-title">Commuter Loom code architecture</title>
-      <desc id="architecture-desc">sketch.js holds a global variable for each class, updates the shared utilities and the three mechanics every frame, and passes one frame object to the grains; each card lists the class's key fields, methods and local variables.</desc>
+      <desc id="architecture-desc">From top to bottom: the shared utility classes, sketch.js with its functions, global variables, constants and local variables, the two mechanics it updates, the frame object they feed, and the LineStream, Grain and FabricPress classes where they meet. Each card lists the class's constructor, fields, methods and local variables.</desc>
       <defs>
         <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#a3a9b8"/></marker>
         <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#e8a75e"/></marker>
@@ -33,293 +33,287 @@
 <line x1="172" y1="28" x2="188" y2="28" stroke="#A3AEB5" stroke-width="3" stroke-linecap="round"/>
 <line x1="194" y1="28" x2="210" y2="28" stroke="#14B866" stroke-width="3" stroke-linecap="round"/>
 <line x1="216" y1="28" x2="232" y2="28" stroke="#EE3D52" stroke-width="3" stroke-linecap="round"/>
-<text x="40" y="64" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" letter-spacing="1.6" fill="#8d93a1">SHARED STATE · utils/</text>
-<text x="692" y="64" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" letter-spacing="1.6" fill="#8d93a1">CONDUCTOR</text>
-<text x="1024" y="64" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" letter-spacing="1.6" fill="#8d93a1">MECHANICS · mechanics/</text>
-<text x="1376" y="64" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" letter-spacing="1.6" fill="#8d93a1">WHERE THEY MEET</text>
-<line x1="656" y1="134" x2="690" y2="134" stroke="#a3a9b8" stroke-width="1.2" marker-end="url(#arrow)"/>
-<line x1="656" y1="355" x2="690" y2="355" stroke="#a3a9b8" stroke-width="1.2" marker-end="url(#arrow)"/>
-<line x1="656" y1="562" x2="690" y2="562" stroke="#a3a9b8" stroke-width="1.2" marker-end="url(#arrow)"/>
-<line x1="656" y1="769" x2="690" y2="769" stroke="#a3a9b8" stroke-width="1.2" marker-end="url(#arrow)"/>
-<line x1="656" y1="976" x2="690" y2="976" stroke="#a3a9b8" stroke-width="1.2" marker-end="url(#arrow)"/>
-<line x1="340" y1="134" x2="348" y2="134" stroke="#a3a9b8" stroke-width="1.2"/>
-<line x1="340" y1="371" x2="348" y2="371" stroke="#a3a9b8" stroke-width="1.2"/>
-<line x1="340" y1="668" x2="348" y2="668" stroke="#a3a9b8" stroke-width="1.2"/>
-<line x1="340" y1="935" x2="348" y2="935" stroke="#a3a9b8" stroke-width="1.2"/>
-<path d="M348,935 V92 Q348,84 356,84 H724 Q732,84 732,92 V102" fill="none" stroke="#a3a9b8" stroke-width="1.2" marker-end="url(#arrow)"/>
-<line x1="992" y1="198" x2="1022" y2="198" stroke="#a3a9b8" stroke-width="1.2" marker-end="url(#arrow)"/>
-<line x1="992" y1="527" x2="1022" y2="527" stroke="#a3a9b8" stroke-width="1.2" marker-end="url(#arrow)"/>
-<line x1="992" y1="134" x2="1374" y2="134" stroke="#e8a75e" stroke-width="1.6" marker-end="url(#arrow-accent)"/>
-<line x1="1344" y1="188" x2="1374" y2="188" stroke="#a3a9b8" stroke-width="1.2" marker-end="url(#arrow)"/>
-<path d="M1344,527 H1352 Q1360,527 1360,519 V226 Q1360,218 1368,218 H1374" fill="none" stroke="#a3a9b8" stroke-width="1.2" marker-end="url(#arrow)"/>
-<line x1="1528.0" y1="234" x2="1528.0" y2="272" stroke="#e8a75e" stroke-width="1.6" marker-end="url(#arrow-accent)"/>
-<rect x="40" y="104" width="300" height="223" rx="7" fill="#0e111a"/>
-<rect x="40" y="104" width="300" height="223" rx="7" fill="#151925" stroke="rgba(242,239,230,0.18)" stroke-width="1"/>
-<text x="56" y="130" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">TripData</text>
-<text x="324" y="130" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let tripData</text>
-<text x="56" y="152" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">Reads the trips CSV and answers questions</text>
-<text x="56" y="168" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">about it.</text>
-<text x="56" y="190" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>TripData(table, lineNames)</text>
-<text x="56" y="214" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
-<text x="56" y="229" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">months  trips  averageTrips</text>
-<text x="56" y="244" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">networkAverage  quietPeriod</text>
-<text x="56" y="264" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
-<text x="56" y="279" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">getTrips()  getTripRatio()</text>
-<text x="56" y="294" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">getNetworkRatio()  getLineVolume()</text>
-<text x="56" y="309" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">findQuietPeriod()  formatMonth()</text>
-<rect x="40" y="341" width="300" height="283" rx="7" fill="#0e111a"/>
-<rect x="40" y="341" width="300" height="283" rx="7" fill="#151925" stroke="rgba(242,239,230,0.18)" stroke-width="1"/>
-<text x="56" y="367" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">RailNetwork</text>
-<text x="324" y="367" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let railNetwork</text>
-<text x="56" y="389" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">Builds every line's tracks from the station</text>
-<text x="56" y="405" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">grid; draws labels and badges.</text>
-<text x="56" y="427" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>RailNetwork(</text>
-<text x="80" y="442" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">stations, lineRoutes, laneOrder,</text>
-<text x="80" y="457" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">theme</text>
-<text x="56" y="472" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6">)</text>
-<text x="56" y="496" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
-<text x="56" y="511" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">paths  gridUnit  hitPoints  badges</text>
-<text x="56" y="526" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">mapBottom</text>
-<text x="56" y="546" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
-<text x="56" y="561" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">build()  getPathsFor()  smoothCorners()</text>
-<text x="56" y="576" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">findNearestHitPoint()</text>
-<text x="56" y="591" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">findGrabbedDistances()</text>
-<text x="56" y="606" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">drawStationLabels()  drawLineBadges()</text>
-<rect x="40" y="638" width="300" height="253" rx="7" fill="#0e111a"/>
-<rect x="40" y="638" width="300" height="253" rx="7" fill="#151925" stroke="rgba(242,239,230,0.18)" stroke-width="1"/>
-<text x="56" y="664" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">TrackPath</text>
-<text x="324" y="664" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">railNetwork.paths</text>
-<text x="56" y="686" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">One branch of one line as a smooth list of</text>
-<text x="56" y="702" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">points.</text>
-<text x="56" y="724" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>TrackPath(</text>
-<text x="80" y="739" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">lineName, branchIndex, points,</text>
-<text x="80" y="754" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">particleShare</text>
-<text x="56" y="769" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6">)</text>
-<text x="56" y="793" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
-<text x="56" y="808" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">lineName  branchIndex  points  totalLength</text>
-<text x="56" y="823" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">crowding</text>
-<text x="56" y="843" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
-<text x="56" y="858" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">findSegmentIndex()  getPositionAt()</text>
-<text x="56" y="873" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">measureCrowding()  getCrowdingAt()</text>
-<rect x="40" y="905" width="300" height="193" rx="7" fill="#0e111a"/>
-<rect x="40" y="905" width="300" height="193" rx="7" fill="#151925" stroke="rgba(242,239,230,0.18)" stroke-width="1"/>
-<text x="56" y="931" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">ColourTheme</text>
-<text x="324" y="931" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let theme</text>
-<text x="56" y="953" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">Every colour in one place: dark and light</text>
-<text x="56" y="969" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">palettes.</text>
-<text x="56" y="991" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>ColourTheme(themeName)</text>
-<text x="56" y="1015" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
-<text x="56" y="1030" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">name  palette  button</text>
-<text x="56" y="1050" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
-<text x="56" y="1065" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">use()  toggle()  getLineColour()</text>
-<text x="56" y="1080" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">getBackground()</text>
-<rect x="356" y="104" width="300" height="207" rx="7" fill="#0e111a"/>
-<rect x="356" y="104" width="300" height="207" rx="7" fill="#151925" stroke="rgba(242,239,230,0.18)" stroke-width="1"/>
-<text x="372" y="130" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">Timeline</text>
-<text x="640" y="130" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let timeline</text>
-<text x="372" y="152" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">The woven timeline and the timed playback.</text>
-<text x="372" y="174" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>Timeline(tripData, theme)</text>
-<text x="372" y="198" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
-<text x="372" y="213" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">monthIndex  pulse  isPlaying</text>
-<text x="372" y="228" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">threadHeights  playButton</text>
-<text x="372" y="248" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
-<text x="372" y="263" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">update()  draw()  stepMonth()</text>
-<text x="372" y="278" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">setMonthFromX()  togglePlaying()</text>
-<text x="372" y="293" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">restart()</text>
-<rect x="356" y="325" width="300" height="193" rx="7" fill="#0e111a"/>
-<rect x="356" y="325" width="300" height="193" rx="7" fill="#151925" stroke="rgba(242,239,230,0.18)" stroke-width="1"/>
-<text x="372" y="351" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">FabricBreath</text>
-<text x="640" y="351" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let fabricBreath</text>
-<text x="372" y="373" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">The network breathing, deeper and faster in</text>
-<text x="372" y="389" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">busy months.</text>
-<text x="372" y="411" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>FabricBreath()</text>
-<text x="372" y="435" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
-<text x="372" y="450" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">swell  breathAngle  networkActivity</text>
-<text x="372" y="470" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
-<text x="372" y="485" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">update(networkRatio, audioLevel)</text>
-<text x="372" y="500" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">getSwell()  getBusyness()  describe()</text>
-<rect x="356" y="532" width="300" height="193" rx="7" fill="#0e111a"/>
-<rect x="356" y="532" width="300" height="193" rx="7" fill="#151925" stroke="rgba(242,239,230,0.18)" stroke-width="1"/>
-<text x="372" y="558" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">DataPanel</text>
-<text x="640" y="558" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let dataPanel</text>
-<text x="372" y="580" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">Split-flap month and trips, ten-year trace,</text>
-<text x="372" y="596" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">breath monitor.</text>
-<text x="372" y="618" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>DataPanel(tripData, theme)</text>
-<text x="372" y="642" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
-<text x="372" y="657" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">monthFlip  tripsFlip  breathTrace  ripples</text>
-<text x="372" y="677" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
-<text x="372" y="692" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">update()  draw()  drawFlipText()</text>
-<text x="372" y="707" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">drawTenYearTrace()  drawCard()</text>
-<rect x="356" y="739" width="300" height="193" rx="7" fill="#0e111a"/>
-<rect x="356" y="739" width="300" height="193" rx="7" fill="#151925" stroke="rgba(242,239,230,0.18)" stroke-width="1"/>
-<text x="372" y="765" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">InterfaceOverlay</text>
-<text x="640" y="765" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let overlay</text>
-<text x="372" y="787" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">Title, status messages, fades and the</text>
-<text x="372" y="803" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">control dock.</text>
-<text x="372" y="825" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>InterfaceOverlay(theme)</text>
-<text x="372" y="849" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
-<text x="372" y="864" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">statusMessage  buttonArea  logo</text>
-<text x="372" y="884" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
-<text x="372" y="899" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">setStatus()  positionButtons()</text>
-<text x="372" y="914" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">drawHeader()  drawDock()  drawFooter()</text>
-<rect x="356" y="946" width="300" height="127" rx="7" fill="#0e111a"/>
-<rect x="356" y="946" width="300" height="127" rx="7" fill="#151925" stroke="rgba(242,239,230,0.18)" stroke-width="1"/>
-<text x="372" y="972" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">LogoMark</text>
-<text x="640" y="972" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">overlay.logo</text>
-<text x="372" y="994" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">The woven-swatch logo, at any size.</text>
-<text x="372" y="1016" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>LogoMark(theme)</text>
-<text x="372" y="1040" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
-<text x="372" y="1055" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">draw(x, y, size)</text>
-<rect x="692" y="104" width="300" height="994" rx="7" fill="#0e111a"/>
-<rect x="692" y="104" width="300" height="994" rx="7" fill="#151925" stroke="rgba(242,239,230,0.18)" stroke-width="1"/>
-<text x="708" y="130" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">sketch.js</text>
-<text x="708" y="147" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">the conductor · runs every frame</text>
-<text x="708" y="171" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FUNCTIONS</text>
-<text x="708" y="186" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">preload()  setup()  draw()  drawStreams()</text>
-<text x="708" y="201" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">fillStreams()  fitMapAndPanel()</text>
-<text x="708" y="216" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">layoutInterface()  checkPerformance()</text>
-<text x="708" y="231" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">windowResized()</text>
-<text x="708" y="251" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">P5 EVENTS → inputControls</text>
-<text x="708" y="266" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">mousePressed()  mouseDragged()</text>
-<text x="708" y="281" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">mouseReleased()  touchStarted()</text>
-<text x="708" y="296" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">mouseWheel()  keyPressed()</text>
-<text x="708" y="316" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">GLOBAL VARIABLES · LOADED</text>
-<text x="708" y="331" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">tripTable  rumbleSound  humSound</text>
-<text x="708" y="346" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">tapsSound  flipSound</text>
-<text x="708" y="366" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">GLOBAL VARIABLES · OBJECTS</text>
-<text x="708" y="381" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">theme  tripData  railNetwork  timeline</text>
-<text x="708" y="396" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">fabricBreath  dataPanel  overlay</text>
-<text x="708" y="411" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">inputControls  audioReactive</text>
-<text x="708" y="426" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">lineStreams[ ]  fabricPress</text>
-<text x="708" y="446" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">GLOBAL VARIABLES · STATE</text>
-<text x="708" y="461" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">lastMonthShown</text>
-<text x="708" y="481" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">CONSTANTS</text>
-<text x="708" y="496" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#8d93a1" xml:space="preserve">DATA_PATH  RUMBLE_PATH  HUM_PATH</text>
-<text x="708" y="511" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#8d93a1" xml:space="preserve">TAPS_PATH  FLIP_PATH  LINE_NAMES</text>
-<text x="708" y="531" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">LOCAL VARIABLES · draw()</text>
-<text x="708" y="546" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#b9a6e0" xml:space="preserve">isParting</text>
-<text x="708" y="566" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">LOCAL VARIABLES · drawStreams()</text>
-<text x="708" y="581" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#b9a6e0" xml:space="preserve">frame  selectedStream</text>
-<text x="708" y="601" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">EVERY FRAME</text>
-<text x="708" y="616" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">1  update time, sound, breath, hand</text>
-<text x="708" y="631" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">2  build the frame object</text>
-<text x="708" y="646" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">3  draw the grains, then the interface</text>
-<rect x="1376" y="104" width="304" height="130" rx="7" fill="#0e111a"/>
-<rect x="1376" y="104" width="304" height="130" rx="7" fill="rgba(232,167,94,0.08)" stroke="#e8a75e" stroke-width="1.5"/>
-<text x="1392" y="130" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">frame</text>
-<text x="1664" y="130" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">local · drawStreams()</text>
-<text x="1392" y="147" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">one object, passed to every line</text>
-<text x="1392" y="171" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">{ ... }</text>
-<text x="1392" y="186" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">press: fabricPress  input: inputControls</text>
-<text x="1392" y="201" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">pulse: timeline.pulse  breathSwell</text>
-<text x="1392" y="216" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">audio: audioReactive  time</text>
-<rect x="1024" y="168" width="320" height="315" rx="7" fill="#0e111a"/>
-<rect x="1024" y="168" width="320" height="315" rx="7" fill="#151925" stroke="#25A9D1" stroke-width="1.5"/>
-<rect x="1024" y="168" width="320" height="315" rx="7" fill="#25A9D1" fill-opacity="0.06"/>
-<text x="1040" y="194" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">InputControls</text>
-<text x="1328" y="194" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let inputControls</text>
-<circle cx="1045" cy="207.5" r="5" fill="#25A9D1"/>
-<text x="1056" y="211" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" letter-spacing="0.8" fill="#25A9D1">PROMIE · USER INPUT</text>
-<text x="1040" y="233" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">The visitor's hand on the fabric, and their</text>
-<text x="1040" y="249" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">control of time.</text>
-<text x="1040" y="271" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>InputControls(</text>
-<text x="1064" y="286" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">railNetwork, timeline, overlay</text>
-<text x="1040" y="301" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6">)</text>
-<text x="1040" y="325" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
-<text x="1040" y="340" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">selectedLineName  isPulling  pulledLineName</text>
-<text x="1040" y="355" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">pullOffsetX/Y  grabbedDistances  handIsActive</text>
-<text x="1040" y="370" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">handIsGathering  usingTouch  wheelTotal</text>
-<text x="1040" y="390" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
-<text x="1040" y="405" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">update()  getTouchAmount(x, y)</text>
-<text x="1040" y="420" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">applyGather(grain, x, y)</text>
-<text x="1040" y="435" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">getPullWeight(grain)  handleMouseDragged()</text>
-<text x="1040" y="450" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">toggleListening(lineName)  handleKeyPressed()</text>
-<text x="1040" y="465" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">takeControlOfTime()</text>
-<rect x="1024" y="497" width="320" height="300" rx="7" fill="#0e111a"/>
-<rect x="1024" y="497" width="320" height="300" rx="7" fill="#151925" stroke="#14B866" stroke-width="1.5"/>
-<rect x="1024" y="497" width="320" height="300" rx="7" fill="#14B866" fill-opacity="0.06"/>
-<text x="1040" y="523" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">AudioReactive</text>
-<text x="1328" y="523" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let audioReactive</text>
-<circle cx="1045" cy="536.5" r="5" fill="#14B866"/>
-<text x="1056" y="540" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" letter-spacing="0.8" fill="#14B866">GUANGSHUN · AUDIO</text>
-<text x="1040" y="562" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">The city sound: three layers mixed by the data,</text>
-<text x="1040" y="578" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">then analysed.</text>
-<text x="1040" y="600" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>AudioReactive(</text>
-<text x="1064" y="615" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">rumbleSound, humSound, tapsSound,</text>
-<text x="1064" y="630" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">flipSound</text>
-<text x="1040" y="645" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6">)</text>
-<text x="1040" y="669" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
-<text x="1040" y="684" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">layers  fft  level  bass  mid  treble</text>
-<text x="1040" y="699" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">isMuted  currentBusyness  button</text>
-<text x="1040" y="719" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
-<text x="1040" y="734" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">start(overlay)  update()</text>
-<text x="1040" y="749" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">followData(busyness)  playFlip()</text>
-<text x="1040" y="764" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">getBassSqueeze()  getMidShear()</text>
-<text x="1040" y="779" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">getTrebleShiver()  toggleMute()</text>
-<rect x="1376" y="274" width="304" height="244" rx="7" fill="#0e111a"/>
-<rect x="1376" y="274" width="304" height="244" rx="7" fill="#151925" stroke="#DC3A9F" stroke-width="1.5"/>
-<rect x="1376" y="274" width="304" height="244" rx="7" fill="#DC3A9F" fill-opacity="0.06"/>
-<text x="1392" y="300" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">LineStream</text>
-<text x="1664" y="300" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">lineStreams[i]</text>
-<circle cx="1397" cy="313.5" r="5" fill="#DC3A9F"/>
-<text x="1408" y="317" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" letter-spacing="0.8" fill="#DC3A9F">WANGHAO · PERLIN NOISE</text>
-<text x="1392" y="339" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">All the grains of one train line.</text>
-<text x="1392" y="361" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>LineStream(lineName, tripData)</text>
-<text x="1392" y="385" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
-<text x="1392" y="400" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">lineName  grains[ ]  intensity  speedScale</text>
-<text x="1392" y="420" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
-<text x="1392" y="435" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">fillWithGrains()  setMonth()</text>
-<text x="1392" y="450" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">setListening()  update(frame)</text>
-<text x="1392" y="465" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">draw(lineColour, frame)</text>
-<text x="1392" y="485" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">LOCAL VARIABLES · update()</text>
-<text x="1392" y="500" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#b9a6e0" xml:space="preserve">stepPixels  stir</text>
-<rect x="1376" y="532" width="304" height="309" rx="7" fill="#0e111a"/>
-<rect x="1376" y="532" width="304" height="309" rx="7" fill="#151925" stroke="#DC3A9F" stroke-width="1.5"/>
-<rect x="1376" y="532" width="304" height="309" rx="7" fill="#DC3A9F" fill-opacity="0.06"/>
-<text x="1392" y="558" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">Grain</text>
-<text x="1664" y="558" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">in grains[ ]</text>
-<circle cx="1397" cy="571.5" r="5" fill="#DC3A9F"/>
-<text x="1408" y="575" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" letter-spacing="0.8" fill="#DC3A9F">WANGHAO · PERLIN NOISE</text>
-<text x="1392" y="597" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">One stitch or knot travelling along a track.</text>
-<text x="1392" y="619" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>Grain(path)</text>
-<text x="1392" y="643" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
-<text x="1392" y="658" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">path  distance  laneOffset  offsetX/Y</text>
-<text x="1392" y="673" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">velocityX/Y  showThreshold</text>
-<text x="1392" y="693" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
-<text x="1392" y="708" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">move()  getDrift()</text>
-<text x="1392" y="723" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">locate(stream, press, input)</text>
-<text x="1392" y="743" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">LOCAL VARIABLES · locate()</text>
-<text x="1392" y="758" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#b9a6e0" xml:space="preserve">pullWeight  targetX/Y  stiffness  shear</text>
-<text x="1392" y="773" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#b9a6e0" xml:space="preserve">shiver</text>
-<text x="1392" y="793" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">CALLS</text>
-<text x="1392" y="808" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">input.getPullWeight()  input.applyGather()</text>
-<text x="1392" y="823" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">press.getPush()</text>
-<rect x="1376" y="855" width="304" height="179" rx="7" fill="#0e111a"/>
-<rect x="1376" y="855" width="304" height="179" rx="7" fill="#151925" stroke="#DC3A9F" stroke-width="1.5"/>
-<rect x="1376" y="855" width="304" height="179" rx="7" fill="#DC3A9F" fill-opacity="0.06"/>
-<text x="1392" y="881" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">FabricPress</text>
-<text x="1664" y="881" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let fabricPress</text>
-<circle cx="1397" cy="894.5" r="5" fill="#DC3A9F"/>
-<text x="1408" y="898" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" letter-spacing="0.8" fill="#DC3A9F">WANGHAO · PERLIN NOISE</text>
-<text x="1392" y="920" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">The soft dent the hovering pointer makes.</text>
-<text x="1392" y="942" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>FabricPress()</text>
-<text x="1392" y="966" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
-<text x="1392" y="981" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">x  y  strength</text>
-<text x="1392" y="1001" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
-<text x="1392" y="1016" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">update(x, y, isParting)  getPush()</text>
-<rect x="1126.2" y="112" width="115.6" height="15" fill="#0e111a"/>
-<text x="1184.0" y="123" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" letter-spacing="1" fill="#e8a75e">BUILDS THE FRAME</text>
-<line x1="40" y1="1120" x2="1680" y2="1120" stroke="#f2efe6" stroke-opacity="0.12"/>
-<text x="40" y="1142" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e">methods()</text>
-<text x="127.15" y="1142" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6">fields + variables</text>
-<text x="271.45000000000005" y="1142" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#b9a6e0">local variables</text>
-<text x="396.70000000000005" y="1142" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#8d93a1">CONSTANTS</text>
-<text x="483.85" y="1142" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#a3a9b8">let x = the global variable that holds the object</text>
-<line x1="40" y1="1166" x2="66" y2="1166" stroke="#a3a9b8" stroke-width="1.2" marker-end="url(#arrow)"/>
-<text x="76" y="1170" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#a3a9b8">read or updated each frame</text>
-<line x1="290" y1="1166" x2="316" y2="1166" stroke="#e8a75e" stroke-width="1.6" marker-end="url(#arrow-accent)"/>
-<text x="326" y="1170" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#a3a9b8">the frame object</text>
-<text x="1680" y="1170" text-anchor="end" font-family="Raleway, sans-serif" font-style="italic" font-size="13" fill="#a3a9b8">Touch, sound and noise all move the same grains.</text>
+<text x="40" y="58" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" letter-spacing="1.6" fill="#8d93a1">1 · SHARED STATE · utils/</text>
+<text x="40" y="859" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" letter-spacing="1.6" fill="#8d93a1">2 · CONDUCTOR · sketch.js</text>
+<text x="40" y="1164" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" letter-spacing="1.6" fill="#8d93a1">3 · MECHANICS · mechanics/</text>
+<text x="40" y="1493" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" letter-spacing="1.6" fill="#e8a75e">4 · THE FRAME OBJECT · built in drawStreams()</text>
+<text x="40" y="1698" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" letter-spacing="1.6" fill="#8d93a1">5 · WHERE THEY MEET · mechanics/perlin-flow.js</text>
+<line x1="188.0" y1="771" x2="188.0" y2="793" stroke="#a3a9b8" stroke-width="1.4"/>
+<line x1="500.0" y1="771" x2="500.0" y2="793" stroke="#a3a9b8" stroke-width="1.4"/>
+<line x1="812.0" y1="771" x2="812.0" y2="793" stroke="#a3a9b8" stroke-width="1.4"/>
+<line x1="188.0" y1="793" x2="812.0" y2="793" stroke="#a3a9b8" stroke-width="1.4"/>
+<line x1="500.0" y1="793" x2="500.0" y2="837" stroke="#a3a9b8" stroke-width="1.4" marker-end="url(#arrow)"/>
+<line x1="266.0" y1="1086" x2="266.0" y2="1142" stroke="#a3a9b8" stroke-width="1.4" marker-end="url(#arrow)"/>
+<line x1="734.0" y1="1086" x2="734.0" y2="1142" stroke="#a3a9b8" stroke-width="1.4" marker-end="url(#arrow)"/>
+<line x1="266.0" y1="1415" x2="266.0" y2="1471" stroke="#a3a9b8" stroke-width="1.4" marker-end="url(#arrow)"/>
+<line x1="734.0" y1="1415" x2="734.0" y2="1471" stroke="#a3a9b8" stroke-width="1.4" marker-end="url(#arrow)"/>
+<path d="M40,911 H26 Q18,911 18,919 V1525 Q18,1533 26,1533 H38" fill="none" stroke="#e8a75e" stroke-width="1.8" marker-end="url(#arrow-accent)"/>
+<line x1="188.0" y1="1620" x2="188.0" y2="1676" stroke="#e8a75e" stroke-width="1.8" marker-end="url(#arrow-accent)"/>
+<line x1="336.0" y1="1740" x2="350.0" y2="1740" stroke="#a3a9b8" stroke-width="1.4" marker-end="url(#arrow)"/>
+<line x1="648.0" y1="1740" x2="662.0" y2="1740" stroke="#a3a9b8" stroke-width="1.4" marker-end="url(#arrow)"/>
+<rect x="40.0" y="70" width="296.0" height="268" rx="7" fill="#0e111a"/>
+<rect x="40.0" y="70" width="296.0" height="268" rx="7" fill="#151925" stroke="rgba(242,239,230,0.18)" stroke-width="1"/>
+<text x="56.0" y="96" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">TripData</text>
+<text x="320.0" y="96" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let tripData</text>
+<text x="56.0" y="118" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">Reads the trips CSV and answers questions</text>
+<text x="56.0" y="134" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">about it.</text>
+<text x="56.0" y="156" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>TripData(table, lineNames)</text>
+<text x="56.0" y="180" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
+<text x="56.0" y="195" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">months  trips  averageTrips</text>
+<text x="56.0" y="210" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">networkAverage  quietPeriod</text>
+<text x="56.0" y="230" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
+<text x="56.0" y="245" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">getTrips()  getTripRatio()</text>
+<text x="56.0" y="260" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">getNetworkRatio()  getLineVolume()</text>
+<text x="56.0" y="275" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">findQuietPeriod()  formatMonth()</text>
+<rect x="352.0" y="70" width="296.0" height="268" rx="7" fill="#0e111a"/>
+<rect x="352.0" y="70" width="296.0" height="268" rx="7" fill="#151925" stroke="rgba(242,239,230,0.18)" stroke-width="1"/>
+<text x="368.0" y="96" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">RailNetwork</text>
+<text x="632.0" y="96" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let railNetwork</text>
+<text x="368.0" y="118" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">Builds every line's tracks from the station</text>
+<text x="368.0" y="134" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">grid; draws labels and badges.</text>
+<text x="368.0" y="156" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>RailNetwork(</text>
+<text x="392.0" y="171" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">stations, lineRoutes, laneOrder,</text>
+<text x="392.0" y="186" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">theme</text>
+<text x="368.0" y="201" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6">)</text>
+<text x="368.0" y="225" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
+<text x="368.0" y="240" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">paths  gridUnit  hitPoints  badges</text>
+<text x="368.0" y="255" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">mapBottom</text>
+<text x="368.0" y="275" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
+<text x="368.0" y="290" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">build()  getPathsFor()  smoothCorners()</text>
+<text x="368.0" y="305" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">findNearestHitPoint()</text>
+<text x="368.0" y="320" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">findGrabbedDistances()  drawLineBadges()</text>
+<rect x="664.0" y="70" width="296.0" height="268" rx="7" fill="#0e111a"/>
+<rect x="664.0" y="70" width="296.0" height="268" rx="7" fill="#151925" stroke="rgba(242,239,230,0.18)" stroke-width="1"/>
+<text x="680.0" y="96" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">TrackPath</text>
+<text x="944.0" y="96" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">railNetwork.paths</text>
+<text x="680.0" y="118" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">One branch of one line as a smooth list of</text>
+<text x="680.0" y="134" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">points.</text>
+<text x="680.0" y="156" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>TrackPath(</text>
+<text x="704.0" y="171" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">lineName, branchIndex, points,</text>
+<text x="704.0" y="186" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">particleShare</text>
+<text x="680.0" y="201" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6">)</text>
+<text x="680.0" y="225" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
+<text x="680.0" y="240" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">lineName  branchIndex  points</text>
+<text x="680.0" y="255" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">totalLength  crowding</text>
+<text x="680.0" y="275" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
+<text x="680.0" y="290" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">findSegmentIndex()  getPositionAt()</text>
+<text x="680.0" y="305" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">measureCrowding()  getCrowdingAt()</text>
+<rect x="40.0" y="354" width="296.0" height="208" rx="7" fill="#0e111a"/>
+<rect x="40.0" y="354" width="296.0" height="208" rx="7" fill="#151925" stroke="rgba(242,239,230,0.18)" stroke-width="1"/>
+<text x="56.0" y="380" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">Timeline</text>
+<text x="320.0" y="380" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let timeline</text>
+<text x="56.0" y="402" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">The woven timeline and the timed playback.</text>
+<text x="56.0" y="424" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>Timeline(tripData, theme)</text>
+<text x="56.0" y="448" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
+<text x="56.0" y="463" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">monthIndex  pulse  isPlaying</text>
+<text x="56.0" y="478" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">threadHeights  playButton</text>
+<text x="56.0" y="498" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
+<text x="56.0" y="513" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">update()  draw()  stepMonth()</text>
+<text x="56.0" y="528" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">setMonthFromX()  togglePlaying()</text>
+<text x="56.0" y="543" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">restart()</text>
+<rect x="352.0" y="354" width="296.0" height="208" rx="7" fill="#0e111a"/>
+<rect x="352.0" y="354" width="296.0" height="208" rx="7" fill="#151925" stroke="rgba(242,239,230,0.18)" stroke-width="1"/>
+<text x="368.0" y="380" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">FabricBreath</text>
+<text x="632.0" y="380" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let fabricBreath</text>
+<text x="368.0" y="402" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">The network breathing, deeper and faster in</text>
+<text x="368.0" y="418" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">busy months.</text>
+<text x="368.0" y="440" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>FabricBreath()</text>
+<text x="368.0" y="464" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
+<text x="368.0" y="479" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">swell  breathAngle  networkActivity</text>
+<text x="368.0" y="499" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
+<text x="368.0" y="514" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">update(networkRatio, audioLevel)</text>
+<text x="368.0" y="529" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">getSwell()  getBusyness()  describe()</text>
+<rect x="664.0" y="354" width="296.0" height="208" rx="7" fill="#0e111a"/>
+<rect x="664.0" y="354" width="296.0" height="208" rx="7" fill="#151925" stroke="rgba(242,239,230,0.18)" stroke-width="1"/>
+<text x="680.0" y="380" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">DataPanel</text>
+<text x="944.0" y="380" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let dataPanel</text>
+<text x="680.0" y="402" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">Split-flap month and trips, ten-year trace,</text>
+<text x="680.0" y="418" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">breath monitor.</text>
+<text x="680.0" y="440" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>DataPanel(tripData, theme)</text>
+<text x="680.0" y="464" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
+<text x="680.0" y="479" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">monthFlip  tripsFlip  breathTrace</text>
+<text x="680.0" y="494" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">ripples</text>
+<text x="680.0" y="514" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
+<text x="680.0" y="529" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">update()  draw()  drawFlipText()</text>
+<text x="680.0" y="544" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">drawTenYearTrace()  drawCard()</text>
+<rect x="40.0" y="578" width="296.0" height="193" rx="7" fill="#0e111a"/>
+<rect x="40.0" y="578" width="296.0" height="193" rx="7" fill="#151925" stroke="rgba(242,239,230,0.18)" stroke-width="1"/>
+<text x="56.0" y="604" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">InterfaceOverlay</text>
+<text x="320.0" y="604" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let overlay</text>
+<text x="56.0" y="626" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">Title, status messages, fades and the</text>
+<text x="56.0" y="642" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">control dock.</text>
+<text x="56.0" y="664" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>InterfaceOverlay(theme)</text>
+<text x="56.0" y="688" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
+<text x="56.0" y="703" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">statusMessage  buttonArea  logo</text>
+<text x="56.0" y="723" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
+<text x="56.0" y="738" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">setStatus()  positionButtons()</text>
+<text x="56.0" y="753" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">drawHeader()  drawDock()  drawFooter()</text>
+<rect x="352.0" y="578" width="296.0" height="193" rx="7" fill="#0e111a"/>
+<rect x="352.0" y="578" width="296.0" height="193" rx="7" fill="#151925" stroke="rgba(242,239,230,0.18)" stroke-width="1"/>
+<text x="368.0" y="604" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">ColourTheme</text>
+<text x="632.0" y="604" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let theme</text>
+<text x="368.0" y="626" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">Every colour in one place: dark and light</text>
+<text x="368.0" y="642" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">palettes.</text>
+<text x="368.0" y="664" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>ColourTheme(themeName)</text>
+<text x="368.0" y="688" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
+<text x="368.0" y="703" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">name  palette  button</text>
+<text x="368.0" y="723" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
+<text x="368.0" y="738" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">use()  toggle()  getLineColour()</text>
+<text x="368.0" y="753" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">getBackground()</text>
+<rect x="664.0" y="578" width="296.0" height="193" rx="7" fill="#0e111a"/>
+<rect x="664.0" y="578" width="296.0" height="193" rx="7" fill="#151925" stroke="rgba(242,239,230,0.18)" stroke-width="1"/>
+<text x="680.0" y="604" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">LogoMark</text>
+<text x="944.0" y="604" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">overlay.logo</text>
+<text x="680.0" y="626" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">The woven-swatch logo, at any size.</text>
+<text x="680.0" y="648" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>LogoMark(theme)</text>
+<text x="680.0" y="672" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
+<text x="680.0" y="687" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">draw(x, y, size)</text>
+<rect x="40" y="871" width="920" height="215" rx="7" fill="#151925" stroke="#f2efe6" stroke-opacity="0.55" stroke-width="1.2"/>
+<text x="56" y="899" font-family="Raleway, sans-serif" font-weight="700" font-size="17" fill="#f2efe6">sketch.js</text>
+<text x="140" y="899" font-family="Raleway, sans-serif" font-size="12.5" fill="#a3a9b8">The conductor: creates every object, then every frame updates them, builds the frame and draws.</text>
+<text x="56.0" y="903" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6"></text>
+<text x="56.0" y="927" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FUNCTIONS</text>
+<text x="56.0" y="942" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">preload()  setup()  draw()  drawStreams()</text>
+<text x="56.0" y="957" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">fillStreams()  fitMapAndPanel()</text>
+<text x="56.0" y="972" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">layoutInterface()  checkPerformance()</text>
+<text x="56.0" y="987" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">windowResized()</text>
+<text x="56.0" y="1007" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">P5 EVENTS → inputControls</text>
+<text x="56.0" y="1022" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">mousePressed()  mouseDragged()</text>
+<text x="56.0" y="1037" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">mouseReleased()  touchStarted()</text>
+<text x="56.0" y="1052" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">mouseWheel()  keyPressed()</text>
+<text x="368.0" y="903" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6"></text>
+<text x="368.0" y="927" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">GLOBAL VARIABLES · OBJECTS</text>
+<text x="368.0" y="942" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">theme  tripData  railNetwork  timeline</text>
+<text x="368.0" y="957" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">fabricBreath  dataPanel  overlay</text>
+<text x="368.0" y="972" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">inputControls  audioReactive</text>
+<text x="368.0" y="987" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">lineStreams[ ]  fabricPress</text>
+<text x="368.0" y="1007" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">GLOBAL VARIABLES · LOADED</text>
+<text x="368.0" y="1022" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">tripTable  rumbleSound  humSound</text>
+<text x="368.0" y="1037" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">tapsSound  flipSound</text>
+<text x="368.0" y="1057" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">GLOBAL VARIABLES · STATE</text>
+<text x="368.0" y="1072" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">lastMonthShown</text>
+<text x="680.0" y="903" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6"></text>
+<text x="680.0" y="927" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">CONSTANTS</text>
+<text x="680.0" y="942" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#8d93a1" xml:space="preserve">DATA_PATH  RUMBLE_PATH  HUM_PATH</text>
+<text x="680.0" y="957" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#8d93a1" xml:space="preserve">TAPS_PATH  FLIP_PATH  LINE_NAMES</text>
+<text x="680.0" y="977" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">LOCAL VARIABLES · draw()</text>
+<text x="680.0" y="992" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#b9a6e0" xml:space="preserve">isParting</text>
+<text x="680.0" y="1012" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">LOCAL VARIABLES · drawStreams()</text>
+<text x="680.0" y="1027" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#b9a6e0" xml:space="preserve">frame  selectedStream</text>
+<rect x="40.0" y="1176" width="452.0" height="239" rx="7" fill="#0e111a"/>
+<rect x="40.0" y="1176" width="452.0" height="239" rx="7" fill="#151925" stroke="#25A9D1" stroke-width="1.5"/>
+<rect x="40.0" y="1176" width="452.0" height="239" rx="7" fill="#25A9D1" fill-opacity="0.06"/>
+<text x="56.0" y="1202" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">InputControls</text>
+<text x="476.0" y="1202" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let inputControls</text>
+<circle cx="61.0" cy="1215.5" r="5" fill="#25A9D1"/>
+<text x="72.0" y="1219" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" letter-spacing="0.8" fill="#25A9D1">PROMIE · USER INPUT</text>
+<text x="56.0" y="1241" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">The visitor's hand on the fabric, and their control of time.</text>
+<text x="56.0" y="1263" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>InputControls(railNetwork, timeline, overlay)</text>
+<text x="56.0" y="1287" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
+<text x="56.0" y="1302" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">selectedLineName  isPulling  pulledLineName  pullOffsetX/Y</text>
+<text x="56.0" y="1317" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">grabbedDistances  handIsActive  handIsGathering  usingTouch</text>
+<text x="56.0" y="1332" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">wheelTotal</text>
+<text x="56.0" y="1352" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
+<text x="56.0" y="1367" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">update()  getTouchAmount(x, y)  applyGather(grain, x, y)</text>
+<text x="56.0" y="1382" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">getPullWeight(grain)  handleMouseDragged()</text>
+<text x="56.0" y="1397" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">toggleListening(lineName)  handleKeyPressed()  takeControlOfTime()</text>
+<rect x="508.0" y="1176" width="452.0" height="239" rx="7" fill="#0e111a"/>
+<rect x="508.0" y="1176" width="452.0" height="239" rx="7" fill="#151925" stroke="#14B866" stroke-width="1.5"/>
+<rect x="508.0" y="1176" width="452.0" height="239" rx="7" fill="#14B866" fill-opacity="0.06"/>
+<text x="524.0" y="1202" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">AudioReactive</text>
+<text x="944.0" y="1202" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let audioReactive</text>
+<circle cx="529.0" cy="1215.5" r="5" fill="#14B866"/>
+<text x="540.0" y="1219" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" letter-spacing="0.8" fill="#14B866">GUANGSHUN · AUDIO</text>
+<text x="524.0" y="1241" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">The city sound: three layers mixed by the data, then analysed.</text>
+<text x="524.0" y="1263" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>AudioReactive(rumbleSound, humSound, tapsSound, flipSound)</text>
+<text x="524.0" y="1287" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
+<text x="524.0" y="1302" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">layers  fft  level  bass  mid  treble  isMuted  currentBusyness</text>
+<text x="524.0" y="1317" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">button</text>
+<text x="524.0" y="1337" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
+<text x="524.0" y="1352" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">start(overlay)  update()  followData(busyness)  playFlip()</text>
+<text x="524.0" y="1367" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">getBassSqueeze()  getMidShear()  getTrebleShiver()  toggleMute()</text>
+<rect x="40" y="1505" width="920" height="115" rx="7" fill="#0e111a"/>
+<rect x="40" y="1505" width="920" height="115" rx="7" fill="rgba(232,167,94,0.08)" stroke="#e8a75e" stroke-width="1.5"/>
+<text x="56" y="1531" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">frame</text>
+<text x="944" y="1531" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">local variable · drawStreams()</text>
+<text x="56" y="1548" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">One object, passed to every LineStream, so no mechanic reaches into another's file.</text>
+<text x="56" y="1572" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">let frame = { ... }</text>
+<text x="56" y="1587" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">press: fabricPress  input: inputControls  pulse: timeline.pulse  breathSwell: fabricBreath.getSwell()  audio: audioReactive</text>
+<text x="56" y="1602" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">time: frameCount * 0.01</text>
+<rect x="40.0" y="1710" width="296.0" height="309" rx="7" fill="#0e111a"/>
+<rect x="40.0" y="1710" width="296.0" height="309" rx="7" fill="#151925" stroke="#DC3A9F" stroke-width="1.5"/>
+<rect x="40.0" y="1710" width="296.0" height="309" rx="7" fill="#DC3A9F" fill-opacity="0.06"/>
+<text x="56.0" y="1736" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">LineStream</text>
+<text x="320.0" y="1736" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">lineStreams[i]</text>
+<circle cx="61.0" cy="1749.5" r="5" fill="#DC3A9F"/>
+<text x="72.0" y="1753" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" letter-spacing="0.8" fill="#DC3A9F">WANGHAO · PERLIN NOISE</text>
+<text x="56.0" y="1775" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">All the grains of one train line.</text>
+<text x="56.0" y="1797" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>LineStream(lineName, tripData)</text>
+<text x="56.0" y="1821" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
+<text x="56.0" y="1836" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">lineName  grains[ ]  intensity</text>
+<text x="56.0" y="1851" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">speedScale</text>
+<text x="56.0" y="1871" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
+<text x="56.0" y="1886" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">fillWithGrains()  setMonth()</text>
+<text x="56.0" y="1901" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">setListening()  update(frame)</text>
+<text x="56.0" y="1916" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">draw(lineColour, frame)</text>
+<text x="56.0" y="1936" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">LOCAL VARIABLES · update()</text>
+<text x="56.0" y="1951" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#b9a6e0" xml:space="preserve">stepPixels  stir</text>
+<rect x="352.0" y="1710" width="296.0" height="309" rx="7" fill="#0e111a"/>
+<rect x="352.0" y="1710" width="296.0" height="309" rx="7" fill="#151925" stroke="#DC3A9F" stroke-width="1.5"/>
+<rect x="352.0" y="1710" width="296.0" height="309" rx="7" fill="#DC3A9F" fill-opacity="0.06"/>
+<text x="368.0" y="1736" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">Grain</text>
+<text x="632.0" y="1736" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">in grains[ ]</text>
+<circle cx="373.0" cy="1749.5" r="5" fill="#DC3A9F"/>
+<text x="384.0" y="1753" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" letter-spacing="0.8" fill="#DC3A9F">WANGHAO · PERLIN NOISE</text>
+<text x="368.0" y="1775" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">One stitch or knot travelling along a track.</text>
+<text x="368.0" y="1797" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>Grain(path)</text>
+<text x="368.0" y="1821" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
+<text x="368.0" y="1836" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">path  distance  laneOffset  offsetX/Y</text>
+<text x="368.0" y="1851" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">velocityX/Y  showThreshold</text>
+<text x="368.0" y="1871" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
+<text x="368.0" y="1886" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">move()  getDrift()</text>
+<text x="368.0" y="1901" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">locate(stream, press, input)</text>
+<text x="368.0" y="1921" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">LOCAL VARIABLES · locate()</text>
+<text x="368.0" y="1936" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#b9a6e0" xml:space="preserve">pullWeight  targetX/Y  stiffness  shear</text>
+<text x="368.0" y="1951" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#b9a6e0" xml:space="preserve">shiver</text>
+<text x="368.0" y="1971" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">CALLS</text>
+<text x="368.0" y="1986" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">input.getPullWeight()</text>
+<text x="368.0" y="2001" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">input.applyGather()  press.getPush()</text>
+<rect x="664.0" y="1710" width="296.0" height="309" rx="7" fill="#0e111a"/>
+<rect x="664.0" y="1710" width="296.0" height="309" rx="7" fill="#151925" stroke="#DC3A9F" stroke-width="1.5"/>
+<rect x="664.0" y="1710" width="296.0" height="309" rx="7" fill="#DC3A9F" fill-opacity="0.06"/>
+<text x="680.0" y="1736" font-family="Raleway, sans-serif" font-weight="700" font-size="15.5" fill="#f2efe6">FabricPress</text>
+<text x="944.0" y="1736" text-anchor="end" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8">let fabricPress</text>
+<circle cx="685.0" cy="1749.5" r="5" fill="#DC3A9F"/>
+<text x="696.0" y="1753" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" letter-spacing="0.8" fill="#DC3A9F">WANGHAO · PERLIN NOISE</text>
+<text x="680.0" y="1775" font-family="Raleway, sans-serif" font-size="12" fill="#a3a9b8">The soft dent the hovering pointer makes.</text>
+<text x="680.0" y="1797" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6"><tspan fill="#8d93a1">new </tspan>FabricPress()</text>
+<text x="680.0" y="1821" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">FIELDS</text>
+<text x="680.0" y="1836" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#f2efe6" xml:space="preserve">x  y  strength</text>
+<text x="680.0" y="1856" font-family="'Geist Mono', ui-monospace, monospace" font-size="8.5" letter-spacing="1.4" fill="#8d93a1">METHODS</text>
+<text x="680.0" y="1871" font-family="'Geist Mono', ui-monospace, monospace" font-size="10.5" fill="#e8a75e" xml:space="preserve">update(x, y, isParting)  getPush()</text>
+<rect x="411.5" y="804" width="177.0" height="16" fill="#0e111a"/>
+<text x="500.0" y="816" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" letter-spacing="1" fill="#a3a9b8">READ + UPDATED EACH FRAME</text>
+<rect x="233.6" y="1105" width="64.8" height="16" fill="#0e111a"/>
+<text x="266.0" y="1117" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" letter-spacing="1" fill="#a3a9b8">UPDATE()</text>
+<rect x="701.6" y="1105" width="64.8" height="16" fill="#0e111a"/>
+<text x="734.0" y="1117" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" letter-spacing="1" fill="#a3a9b8">UPDATE()</text>
+<rect x="243.5" y="1434" width="45.0" height="16" fill="#0e111a"/>
+<text x="266.0" y="1446" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" letter-spacing="1" fill="#a3a9b8">INPUT</text>
+<rect x="711.5" y="1434" width="45.0" height="16" fill="#0e111a"/>
+<text x="734.0" y="1446" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" letter-spacing="1" fill="#a3a9b8">AUDIO</text>
+<rect x="109.4" y="1639" width="157.2" height="16" fill="#0e111a"/>
+<text x="188.0" y="1651" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-size="9.5" letter-spacing="1" fill="#e8a75e">update(frame) · draw()</text>
+<line x1="40" y1="2043" x2="960" y2="2043" stroke="#f2efe6" stroke-opacity="0.12"/>
+<text x="40" y="2065" font-family="'Geist Mono', ui-monospace, monospace" font-size="11" fill="#e8a75e">methods()</text>
+<text x="130.3" y="2065" font-family="'Geist Mono', ui-monospace, monospace" font-size="11" fill="#f2efe6">fields + variables</text>
+<text x="280.90000000000003" y="2065" font-family="'Geist Mono', ui-monospace, monospace" font-size="11" fill="#b9a6e0">local variables</text>
+<text x="411.40000000000003" y="2065" font-family="'Geist Mono', ui-monospace, monospace" font-size="11" fill="#8d93a1">CONSTANTS</text>
+<text x="501.70000000000005" y="2065" font-family="'Geist Mono', ui-monospace, monospace" font-size="11" fill="#a3a9b8">let x = the variable holding it</text>
+<line x1="40" y1="2089" x2="66" y2="2089" stroke="#a3a9b8" stroke-width="1.4" marker-end="url(#arrow)"/>
+<text x="76" y="2093" font-family="'Geist Mono', ui-monospace, monospace" font-size="11" fill="#a3a9b8">read or updated each frame</text>
+<line x1="300" y1="2089" x2="326" y2="2089" stroke="#e8a75e" stroke-width="1.8" marker-end="url(#arrow-accent)"/>
+<text x="336" y="2093" font-family="'Geist Mono', ui-monospace, monospace" font-size="11" fill="#a3a9b8">the frame object</text>
     </svg>
   </div>
 </body>

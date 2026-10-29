@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What happens every frame</title>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0e111a; display: flex; justify-content: center; padding: 2rem; }
+    .diagram-container { width: 100%; max-width: 1200px; overflow-x: auto; }
+    svg { width: 100%; min-width: 1200px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="diagram-container">
+    <svg viewBox="0 0 1200 584" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="every-frame-title every-frame-desc">
+      <title id="every-frame-title">What happens every frame</title>
+      <desc id="every-frame-desc">Every frame draw() updates the timeline, sound, breath, hand and press; builds one frame object; moves every grain along its track, sideways, by the hand and spring, and shows or hides it; then draws the grains clipped above the dock and the interface on top.</desc>
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#a3a9b8"/></marker>
+        <marker id="arrow-amber" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#e8a75e"/></marker>
+      </defs>
+<rect width="1200" height="700" fill="#0e111a"/>
+<line x1="40" y1="30" x2="56" y2="30" stroke="#F5A93F" stroke-width="3" stroke-linecap="round"/>
+<line x1="62" y1="30" x2="78" y2="30" stroke="#25A9D1" stroke-width="3" stroke-linecap="round"/>
+<line x1="84" y1="30" x2="100" y2="30" stroke="#EC7A37" stroke-width="3" stroke-linecap="round"/>
+<line x1="106" y1="30" x2="122" y2="30" stroke="#3D86D6" stroke-width="3" stroke-linecap="round"/>
+<line x1="128" y1="30" x2="144" y2="30" stroke="#DC3A9F" stroke-width="3" stroke-linecap="round"/>
+<line x1="150" y1="30" x2="166" y2="30" stroke="#7E9EDB" stroke-width="3" stroke-linecap="round"/>
+<line x1="172" y1="30" x2="188" y2="30" stroke="#A3AEB5" stroke-width="3" stroke-linecap="round"/>
+<line x1="194" y1="30" x2="210" y2="30" stroke="#14B866" stroke-width="3" stroke-linecap="round"/>
+<line x1="216" y1="30" x2="232" y2="30" stroke="#EE3D52" stroke-width="3" stroke-linecap="round"/>
+<text x="40" y="66" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10.5" letter-spacing="1.6" fill="#8d93a1">EVERY FRAME, ABOUT 60 TIMES A SECOND · draw() in sketch.js</text>
+<rect x="40" y="84" width="210" height="400" rx="10" fill="#151925" stroke="rgba(242,239,230,0.14)"/>
+<circle cx="66" cy="112" r="13" fill="#e8a75e"/>
+<text x="66" y="117" text-anchor="middle" font-family="Raleway, sans-serif" font-weight="700" font-size="13" letter-spacing="0" fill="#0e111a">1</text>
+<text x="88" y="117" text-anchor="start" font-family="Raleway, sans-serif" font-weight="700" font-size="16" letter-spacing="0" fill="#f2efe6">Update</text>
+<text x="58" y="146" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="12.5" letter-spacing="0" fill="#a3a9b8">Everything the grains read</text>
+<text x="58" y="163" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="12.5" letter-spacing="0" fill="#a3a9b8">from moves on first.</text>
+<rect x="56" y="188" width="178" height="44" rx="6" fill="#10131c" stroke="#A3AEB5" stroke-opacity="0.55"/>
+<rect x="56" y="188" width="4" height="44" rx="2" fill="#A3AEB5"/>
+<text x="70" y="207" text-anchor="start" font-family="Raleway, sans-serif" font-weight="700" font-size="12.5" letter-spacing="0" fill="#f2efe6">Timeline</text>
+<text x="70" y="223" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#a3a9b8">month · pulse</text>
+<rect x="56" y="244" width="178" height="44" rx="6" fill="#10131c" stroke="#14B866" stroke-opacity="0.55"/>
+<rect x="56" y="244" width="4" height="44" rx="2" fill="#14B866"/>
+<text x="70" y="263" text-anchor="start" font-family="Raleway, sans-serif" font-weight="700" font-size="12.5" letter-spacing="0" fill="#f2efe6">AudioReactive</text>
+<text x="70" y="279" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#a3a9b8">bass · mid · treble</text>
+<rect x="56" y="300" width="178" height="44" rx="6" fill="#10131c" stroke="#A3AEB5" stroke-opacity="0.55"/>
+<rect x="56" y="300" width="4" height="44" rx="2" fill="#A3AEB5"/>
+<text x="70" y="319" text-anchor="start" font-family="Raleway, sans-serif" font-weight="700" font-size="12.5" letter-spacing="0" fill="#f2efe6">FabricBreath</text>
+<text x="70" y="335" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#a3a9b8">swell</text>
+<rect x="56" y="356" width="178" height="44" rx="6" fill="#10131c" stroke="#25A9D1" stroke-opacity="0.55"/>
+<rect x="56" y="356" width="4" height="44" rx="2" fill="#25A9D1"/>
+<text x="70" y="375" text-anchor="start" font-family="Raleway, sans-serif" font-weight="700" font-size="12.5" letter-spacing="0" fill="#f2efe6">InputControls</text>
+<text x="70" y="391" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#a3a9b8">hand · pull</text>
+<rect x="56" y="412" width="178" height="44" rx="6" fill="#10131c" stroke="#DC3A9F" stroke-opacity="0.55"/>
+<rect x="56" y="412" width="4" height="44" rx="2" fill="#DC3A9F"/>
+<text x="70" y="431" text-anchor="start" font-family="Raleway, sans-serif" font-weight="700" font-size="12.5" letter-spacing="0" fill="#f2efe6">FabricPress</text>
+<text x="70" y="447" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#a3a9b8">dent</text>
+<line x1="250" y1="284" x2="278" y2="284" stroke="#e8a75e" stroke-width="2" marker-end="url(#arrow-amber)"/>
+<rect x="280" y="84" width="210" height="400" rx="10" fill="#151925" stroke="rgba(242,239,230,0.14)"/>
+<circle cx="306" cy="112" r="13" fill="#e8a75e"/>
+<text x="306" y="117" text-anchor="middle" font-family="Raleway, sans-serif" font-weight="700" font-size="13" letter-spacing="0" fill="#0e111a">2</text>
+<text x="328" y="117" text-anchor="start" font-family="Raleway, sans-serif" font-weight="700" font-size="16" letter-spacing="0" fill="#f2efe6">Build the frame</text>
+<text x="298" y="146" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="12.5" letter-spacing="0" fill="#a3a9b8">One object carries it all to</text>
+<text x="298" y="163" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="12.5" letter-spacing="0" fill="#a3a9b8">every line, so no mechanic</text>
+<text x="298" y="180" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="12.5" letter-spacing="0" fill="#a3a9b8">reaches into another's file.</text>
+<rect x="296" y="220" width="178" height="206" rx="6" fill="#0a0c13" stroke="#e8a75e" stroke-opacity="0.6"/>
+<text x="310" y="244" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="11.5" letter-spacing="0" fill="#e8a75e">let frame = {</text>
+<circle cx="322" cy="266" r="3" fill="#DC3A9F"/>
+<text x="332" y="270" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="11.5" letter-spacing="0" fill="#f2efe6">press,</text>
+<circle cx="322" cy="289" r="3" fill="#25A9D1"/>
+<text x="332" y="293" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="11.5" letter-spacing="0" fill="#f2efe6">input,</text>
+<circle cx="322" cy="312" r="3" fill="#A3AEB5"/>
+<text x="332" y="316" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="11.5" letter-spacing="0" fill="#f2efe6">pulse,</text>
+<circle cx="322" cy="335" r="3" fill="#A3AEB5"/>
+<text x="332" y="339" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="11.5" letter-spacing="0" fill="#f2efe6">breathSwell,</text>
+<circle cx="322" cy="358" r="3" fill="#14B866"/>
+<text x="332" y="362" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="11.5" letter-spacing="0" fill="#f2efe6">audio,</text>
+<circle cx="322" cy="381" r="3" fill="#A3AEB5"/>
+<text x="332" y="385" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="11.5" letter-spacing="0" fill="#f2efe6">time,</text>
+<text x="310" y="412" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="11.5" letter-spacing="0" fill="#e8a75e">};</text>
+<line x1="490" y1="284" x2="518" y2="284" stroke="#e8a75e" stroke-width="2" marker-end="url(#arrow-amber)"/>
+<rect x="520" y="84" width="440" height="400" rx="10" fill="#151925" stroke="rgba(242,239,230,0.14)"/>
+<circle cx="546" cy="112" r="13" fill="#e8a75e"/>
+<text x="546" y="117" text-anchor="middle" font-family="Raleway, sans-serif" font-weight="700" font-size="13" letter-spacing="0" fill="#0e111a">3</text>
+<text x="568" y="117" text-anchor="start" font-family="Raleway, sans-serif" font-weight="700" font-size="16" letter-spacing="0" fill="#f2efe6">Move every grain</text>
+<text x="538" y="146" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="12.5" letter-spacing="0" fill="#a3a9b8">Each LineStream passes the frame to its grains. Every grain, every</text>
+<text x="538" y="163" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="12.5" letter-spacing="0" fill="#a3a9b8">frame:</text>
+<rect x="536" y="184" width="196" height="132" rx="6" fill="#10131c" stroke="rgba(242,239,230,0.1)"/>
+<line x1="548" y1="212" x2="718" y2="212" stroke="rgba(242,239,230,0.15)"/>
+<rect x="556.0" y="210.6" width="8" height="2.8" rx="1.2" fill="#F5A93F" opacity="1.0" transform="rotate(0 560.0 212.0)"/>
+<rect x="582.0" y="210.6" width="8" height="2.8" rx="1.2" fill="#F5A93F" opacity="1.0" transform="rotate(0 586.0 212.0)"/>
+<rect x="608.0" y="210.6" width="8" height="2.8" rx="1.2" fill="#F5A93F" opacity="1.0" transform="rotate(0 612.0 212.0)"/>
+<rect x="634.0" y="210.6" width="8" height="2.8" rx="1.2" fill="#F5A93F" opacity="1.0" transform="rotate(0 638.0 212.0)"/>
+<rect x="660.0" y="210.6" width="8" height="2.8" rx="1.2" fill="#F5A93F" opacity="1.0" transform="rotate(0 664.0 212.0)"/>
+<rect x="686.0" y="210.6" width="8" height="2.8" rx="1.2" fill="#F5A93F" opacity="1.0" transform="rotate(0 690.0 212.0)"/>
+<line x1="698" y1="202" x2="720" y2="202" stroke="#a3a9b8" stroke-width="1.4" marker-end="url(#arrow)"/>
+<text x="548" y="238" text-anchor="start" font-family="Raleway, sans-serif" font-weight="700" font-size="13" letter-spacing="0" fill="#f2efe6">Along the track</text>
+<text x="548" y="255" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="10.5" letter-spacing="0" fill="#a3a9b8">own random speed, scaled by</text>
+<rect x="548" y="266" width="51.0" height="18" rx="9" fill="#e8a75e" fill-opacity="0.14" stroke="#e8a75e" stroke-opacity="0.5"/>
+<circle cx="557" cy="275" r="3" fill="#e8a75e"/>
+<text x="564" y="279" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#f2efe6">trips</text>
+<rect x="605.0" y="266" width="75.80000000000001" height="18" rx="9" fill="#25A9D1" fill-opacity="0.14" stroke="#25A9D1" stroke-opacity="0.5"/>
+<circle cx="614.0" cy="275" r="3" fill="#25A9D1"/>
+<text x="621.0" y="279" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#f2efe6">listening</text>
+<rect x="548" y="290" width="57.2" height="18" rx="9" fill="#A3AEB5" fill-opacity="0.14" stroke="#A3AEB5" stroke-opacity="0.5"/>
+<circle cx="557" cy="299" r="3" fill="#A3AEB5"/>
+<text x="564" y="303" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#f2efe6">breath</text>
+<rect x="611.2" y="290" width="44.8" height="18" rx="9" fill="#25A9D1" fill-opacity="0.14" stroke="#25A9D1" stroke-opacity="0.5"/>
+<circle cx="620.2" cy="299" r="3" fill="#25A9D1"/>
+<text x="627.2" y="303" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#f2efe6">stir</text>
+<rect x="748" y="184" width="196" height="132" rx="6" fill="#10131c" stroke="rgba(242,239,230,0.1)"/>
+<polyline points="760,212.0 764,214.0 768,215.8 772,217.3 776,218.4 780,218.9 784,218.9 788,218.4 792,217.3 796,215.8 800,214.0 804,212.0 808,210.0 812,208.2 816,206.7 820,205.6 824,205.1 828,205.1 832,205.6 836,206.7 840,208.2 844,210.0 848,212.0 852,214.0 856,215.8 860,217.3 864,218.4 868,218.9 872,218.9 876,218.4 880,217.3 884,215.8 888,213.9 892,212.0 896,210.0 900,208.2 904,206.7 908,205.6 912,205.1 916,205.1 920,205.6 924,206.7 928,208.2" fill="none" stroke="#DC3A9F" stroke-width="1.6"/>
+<rect x="762.0" y="213.5" width="8" height="2.8" rx="1.2" fill="#25A9D1" opacity="1.0" transform="rotate(0 766.0 214.9)"/>
+<rect x="790.0" y="215.2" width="8" height="2.8" rx="1.2" fill="#25A9D1" opacity="1.0" transform="rotate(0 794.0 216.6)"/>
+<rect x="818.0" y="203.9" width="8" height="2.8" rx="1.2" fill="#25A9D1" opacity="1.0" transform="rotate(0 822.0 205.3)"/>
+<rect x="846.0" y="211.6" width="8" height="2.8" rx="1.2" fill="#25A9D1" opacity="1.0" transform="rotate(0 850.0 213.0)"/>
+<rect x="874.0" y="216.5" width="8" height="2.8" rx="1.2" fill="#25A9D1" opacity="1.0" transform="rotate(0 878.0 217.9)"/>
+<rect x="902.0" y="204.7" width="8" height="2.8" rx="1.2" fill="#25A9D1" opacity="1.0" transform="rotate(0 906.0 206.1)"/>
+<text x="760" y="238" text-anchor="start" font-family="Raleway, sans-serif" font-weight="700" font-size="13" letter-spacing="0" fill="#f2efe6">Sideways</text>
+<text x="760" y="255" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="10.5" letter-spacing="0" fill="#a3a9b8">lane, then</text>
+<rect x="760" y="266" width="94.4" height="18" rx="9" fill="#DC3A9F" fill-opacity="0.14" stroke="#DC3A9F" stroke-opacity="0.5"/>
+<circle cx="769" cy="275" r="3" fill="#DC3A9F"/>
+<text x="776" y="279" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#f2efe6">Perlin drift</text>
+<rect x="860.4" y="266" width="63.4" height="18" rx="9" fill="#14B866" fill-opacity="0.14" stroke="#14B866" stroke-opacity="0.5"/>
+<circle cx="869.4" cy="275" r="3" fill="#14B866"/>
+<text x="876.4" y="279" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#f2efe6">squeeze</text>
+<rect x="760" y="290" width="51.0" height="18" rx="9" fill="#14B866" fill-opacity="0.14" stroke="#14B866" stroke-opacity="0.5"/>
+<circle cx="769" cy="299" r="3" fill="#14B866"/>
+<text x="776" y="303" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#f2efe6">shear</text>
+<rect x="817.0" y="290" width="57.2" height="18" rx="9" fill="#14B866" fill-opacity="0.14" stroke="#14B866" stroke-opacity="0.5"/>
+<circle cx="826.0" cy="299" r="3" fill="#14B866"/>
+<text x="833.0" y="303" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#f2efe6">shiver</text>
+<rect x="536" y="330" width="196" height="132" rx="6" fill="#10131c" stroke="rgba(242,239,230,0.1)"/>
+<path d="M548,350 C608,350 614,364 634,364 C654,364 660,350 720,350" fill="none" stroke="#F5A93F" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 4"/>
+<polygon points="640,354 640,367 643,364 645,369 648,368 645,363 649,363" fill="#f2efe6"/>
+<text x="548" y="384" text-anchor="start" font-family="Raleway, sans-serif" font-weight="700" font-size="13" letter-spacing="0" fill="#f2efe6">Hand and spring</text>
+<text x="548" y="401" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="10.5" letter-spacing="0" fill="#a3a9b8">pushed, then eased back</text>
+<rect x="548" y="412" width="51.0" height="18" rx="9" fill="#DC3A9F" fill-opacity="0.14" stroke="#DC3A9F" stroke-opacity="0.5"/>
+<circle cx="557" cy="421" r="3" fill="#DC3A9F"/>
+<text x="564" y="425" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#f2efe6">press</text>
+<rect x="605.0" y="412" width="57.2" height="18" rx="9" fill="#25A9D1" fill-opacity="0.14" stroke="#25A9D1" stroke-opacity="0.5"/>
+<circle cx="614.0" cy="421" r="3" fill="#25A9D1"/>
+<text x="621.0" y="425" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#f2efe6">gather</text>
+<rect x="668.2" y="412" width="44.8" height="18" rx="9" fill="#25A9D1" fill-opacity="0.14" stroke="#25A9D1" stroke-opacity="0.5"/>
+<circle cx="677.2" cy="421" r="3" fill="#25A9D1"/>
+<text x="684.2" y="425" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#f2efe6">pull</text>
+<rect x="548" y="436" width="57.2" height="18" rx="9" fill="#25A9D1" fill-opacity="0.14" stroke="#25A9D1" stroke-opacity="0.5"/>
+<circle cx="557" cy="445" r="3" fill="#25A9D1"/>
+<text x="564" y="449" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#f2efe6">spring</text>
+<rect x="748" y="330" width="196" height="132" rx="6" fill="#10131c" stroke="rgba(242,239,230,0.1)"/>
+<rect x="764.0" y="353.7" width="8" height="2.8" rx="1.2" fill="#14B866" opacity="0.15" transform="rotate(0 768.0 355.1)"/>
+<rect x="776.0" y="358.7" width="8" height="2.8" rx="1.2" fill="#14B866" opacity="1" transform="rotate(0 780.0 360.1)"/>
+<rect x="788.0" y="356.6" width="8" height="2.8" rx="1.2" fill="#14B866" opacity="1" transform="rotate(0 792.0 358.0)"/>
+<rect x="800.0" y="357.8" width="8" height="2.8" rx="1.2" fill="#14B866" opacity="0.15" transform="rotate(0 804.0 359.2)"/>
+<rect x="812.0" y="353.4" width="8" height="2.8" rx="1.2" fill="#14B866" opacity="1" transform="rotate(0 816.0 354.8)"/>
+<rect x="824.0" y="359.3" width="8" height="2.8" rx="1.2" fill="#14B866" opacity="1" transform="rotate(0 828.0 360.7)"/>
+<rect x="836.0" y="358.7" width="8" height="2.8" rx="1.2" fill="#14B866" opacity="1" transform="rotate(0 840.0 360.1)"/>
+<rect x="848.0" y="356.2" width="8" height="2.8" rx="1.2" fill="#14B866" opacity="0.15" transform="rotate(0 852.0 357.6)"/>
+<rect x="860.0" y="354.4" width="8" height="2.8" rx="1.2" fill="#14B866" opacity="0.15" transform="rotate(0 864.0 355.8)"/>
+<rect x="872.0" y="359.8" width="8" height="2.8" rx="1.2" fill="#14B866" opacity="1" transform="rotate(0 876.0 361.2)"/>
+<rect x="884.0" y="352.8" width="8" height="2.8" rx="1.2" fill="#14B866" opacity="0.15" transform="rotate(0 888.0 354.2)"/>
+<rect x="896.0" y="360.1" width="8" height="2.8" rx="1.2" fill="#14B866" opacity="1" transform="rotate(0 900.0 361.5)"/>
+<rect x="908.0" y="354.3" width="8" height="2.8" rx="1.2" fill="#14B866" opacity="1" transform="rotate(0 912.0 355.7)"/>
+<rect x="920.0" y="352.8" width="8" height="2.8" rx="1.2" fill="#14B866" opacity="1" transform="rotate(0 924.0 354.2)"/>
+<text x="760" y="384" text-anchor="start" font-family="Raleway, sans-serif" font-weight="700" font-size="13" letter-spacing="0" fill="#f2efe6">Show or hide</text>
+<text x="760" y="401" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="10.5" letter-spacing="0" fill="#a3a9b8">fades in or out by</text>
+<rect x="760" y="412" width="100.60000000000001" height="18" rx="9" fill="#e8a75e" fill-opacity="0.14" stroke="#e8a75e" stroke-opacity="0.5"/>
+<circle cx="769" cy="421" r="3" fill="#e8a75e"/>
+<text x="776" y="425" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#f2efe6">month's share</text>
+<line x1="960" y1="284" x2="988" y2="284" stroke="#e8a75e" stroke-width="2" marker-end="url(#arrow-amber)"/>
+<rect x="990" y="84" width="170" height="400" rx="10" fill="#151925" stroke="rgba(242,239,230,0.14)"/>
+<circle cx="1016" cy="112" r="13" fill="#e8a75e"/>
+<text x="1016" y="117" text-anchor="middle" font-family="Raleway, sans-serif" font-weight="700" font-size="13" letter-spacing="0" fill="#0e111a">4</text>
+<text x="1038" y="117" text-anchor="start" font-family="Raleway, sans-serif" font-weight="700" font-size="16" letter-spacing="0" fill="#f2efe6">Draw</text>
+<text x="1008" y="146" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="12.5" letter-spacing="0" fill="#a3a9b8">Grains first, then the</text>
+<text x="1008" y="163" text-anchor="start" font-family="Raleway, sans-serif" font-weight="400" font-size="12.5" letter-spacing="0" fill="#a3a9b8">interface on top.</text>
+<rect x="1006" y="188" width="138" height="118" rx="6" fill="#0a0c13" stroke="rgba(242,239,230,0.16)"/>
+<path d="M1014,210 H1136" stroke="#F5A93F" stroke-width="2.6" stroke-dasharray="6 4" stroke-linecap="round"/>
+<path d="M1014,228 H1136" stroke="#25A9D1" stroke-width="2.6" stroke-dasharray="6 4" stroke-linecap="round"/>
+<path d="M1014,246 H1136" stroke="#DC3A9F" stroke-width="2.6" stroke-dasharray="6 4" stroke-linecap="round"/>
+<path d="M1014,264 H1136" stroke="#14B866" stroke-width="2.6" stroke-dasharray="6 4" stroke-linecap="round"/>
+<line x1="1006" y1="284" x2="1144" y2="284" stroke="#e8a75e" stroke-width="1.4" stroke-dasharray="4 3"/>
+<text x="1014" y="300" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="0" fill="#e8a75e">beginClip()</text>
+<rect x="1006" y="324" width="138" height="26" rx="5" fill="#10131c" stroke="rgba(242,239,230,0.14)"/>
+<text x="1016" y="341" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10.5" letter-spacing="0" fill="#f2efe6">labels + badges</text>
+<rect x="1006" y="358" width="138" height="26" rx="5" fill="#10131c" stroke="rgba(242,239,230,0.14)"/>
+<text x="1016" y="375" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10.5" letter-spacing="0" fill="#f2efe6">data panel</text>
+<rect x="1006" y="392" width="138" height="26" rx="5" fill="#10131c" stroke="rgba(242,239,230,0.14)"/>
+<text x="1016" y="409" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10.5" letter-spacing="0" fill="#f2efe6">timeline + dock</text>
+<path d="M1075.0,484 V506 Q1075.0,514 1067.0,514 H153.0 Q145.0,514 145.0,506 V486" fill="none" stroke="#a3a9b8" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+<rect x="490.0" y="504" width="220" height="20" fill="#0e111a"/>
+<text x="600.0" y="518" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10.5" letter-spacing="0" fill="#8d93a1">next frame, about 16 ms later</text>
+<text x="40" y="558" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="10" letter-spacing="1.4" fill="#8d93a1">WHO MOVES THE GRAIN</text>
+<circle cx="210" cy="554" r="4" fill="#e8a75e"/>
+<text x="220" y="558" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="11" letter-spacing="0" fill="#f2efe6">data</text>
+<circle cx="273.2" cy="554" r="4" fill="#DC3A9F"/>
+<text x="283.2" y="558" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="11" letter-spacing="0" fill="#f2efe6">Wanghao · noise</text>
+<circle cx="411.2" cy="554" r="4" fill="#14B866"/>
+<text x="421.2" y="558" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="11" letter-spacing="0" fill="#f2efe6">Guangshun · sound</text>
+<circle cx="562.8" cy="554" r="4" fill="#25A9D1"/>
+<text x="572.8" y="558" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="11" letter-spacing="0" fill="#f2efe6">Promie · hand</text>
+<circle cx="687.1999999999999" cy="554" r="4" fill="#A3AEB5"/>
+<text x="697.1999999999999" y="558" text-anchor="start" font-family="'Geist Mono', ui-monospace, monospace" font-weight="400" font-size="11" letter-spacing="0" fill="#f2efe6">shared</text>
+    </svg>
+  </div>
+</body>
+</html>

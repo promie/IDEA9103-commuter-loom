@@ -45,13 +45,9 @@ Click once to turn the sound on, then watch and listen as the network breathes d
 
 ## The mechanics
 
-| Member | Mechanic | File |
-|---|---|---|
-| Guangshun Wen (gwen0553) | Audio | `mechanics/audio-reactive.js` |
-| Wanghao Jin (wjin0936) | Perlin noise and randomness | `mechanics/perlin-flow.js` |
-| Promie Yutasane (pyut8988) | User input | `mechanics/input-controls.js` |
+Each of us built one mechanic, and all three act on the same grains.
 
-The timed playback (`utils/timeline.js`) and the network's breathing (`utils/fabric-breath.js`) are shared utilities that every mechanic reads from.
+![Who built which mechanic: Wanghao Jin (wjin0936), Perlin noise and randomness, mechanics/perlin-flow.js; Guangshun Wen (gwen0553), Audio, mechanics/audio-reactive.js; Promie Yutasane (pyut8988), User input, mechanics/input-controls.js. All three share utils/timeline.js and utils/fabric-breath.js.](docs/team.png)
 
 ### Perlin noise and randomness · Wanghao
 
@@ -99,31 +95,31 @@ The visitor's hand on the fabric, and their control of time. Hold to gather the 
 
 ## How it's built
 
-### Code structure
+### Project structure
 
-Each part of the artwork is a class in its own file, and each mechanic lives in its own script. `sketch.js` creates the objects and calls them in order every frame. Files are loaded with `<script>` tags in `index.html`: shared utilities first, then the mechanics, then `sketch.js`.
-
-![Commuter Loom architecture: every class with its constructor, fields, methods and key local variables; sketch.js holds a global variable for each object, updates the utilities and mechanics every frame, and passes one frame object to the grains](docs/architecture.png)
+Each part of the artwork is a class in its own file. The page files sit at the root, each teammate's mechanic has its own file in `mechanics/`, and the classes every mechanic shares live in `utils/`. `index.html` loads them with `<script>` tags in that order (utilities, then mechanics, then `sketch.js`), so each class exists before it is used.
 
 ![Commuter Loom project structure: the root page files, the three mechanics with the teammate who owns each, the shared utilities and the other folders, each with what it does](docs/project-structure.png)
 
-<sub>Diagram sources: [`docs/architecture.html`](docs/architecture.html) · [`docs/project-structure.html`](docs/project-structure.html)</sub>
+### Code structure
+
+`sketch.js` is the conductor. It keeps one global variable for each object, and every frame it updates the shared utilities and the mechanics, then builds one `frame` object that carries the hand, the sound, the pulse and the breath to the grains. Each card shows a class with its constructor, fields, key methods and local variables.
+
+![Commuter Loom architecture: every class with its constructor, fields, methods and key local variables; sketch.js holds a global variable for each object, updates the utilities and mechanics every frame, and passes one frame object to the grains](docs/architecture.png)
+
+<sub>Diagram sources: [`docs/project-structure.html`](docs/project-structure.html) · [`docs/architecture.html`](docs/architecture.html)</sub>
 
 ### Every frame
 
-`draw()` updates the timeline, sound, breathing and input first, because every grain reads from them. It then builds one `frame` object (the press, the hand, the month's pulse, the breath, the sound and the time) and passes it to each `LineStream`, so the mechanics meet on the same grains without reaching into each other's files. Each grain:
+About 60 times a second, `draw()` runs the same four steps. Everything the grains read from is updated first, then packed into one `frame` object, so the three mechanics meet on the same grains without reaching into each other's files. The colours show who moves the grain at each step.
 
-1. moves along its track at its own random speed, scaled by the month's data, listening mode, the breath and the hand's stir;
-2. takes its sideways position from its lane and the Perlin drift, then the bass squeeze, mid shear and treble shiver;
-3. is parted by the `FabricPress`, then pulled towards the hand or the pulled shape and eased back onto its track by a damped spring;
-4. shows or hides depending on the month's share of trips.
-
-Everything on the map is clipped above the control dock with `beginClip()`, so the lines end exactly at the dock.
+![Every frame: 1 update the timeline, sound, breath, hand and press; 2 build one frame object; 3 move every grain along its track, sideways, by the hand and spring, and show or hide it by the month's share; 4 draw the grains clipped above the dock, then the interface](docs/every-frame.png)
 
 ### Shared techniques
 
-- **Breathing**: a `deltaTime` timer and `sin()` give a swell and release whose depth and speed follow the month's trips.
-- **Rounded tracks**: Chaikin's corner cutting smooths the schematic corners.
+A few techniques serve the whole artwork rather than one mechanic.
+
+![Shared techniques: breathing with a deltaTime timer and sin(), rounded tracks with Chaikin's corner cutting, and the map clipped above the control dock with beginClip()](docs/shared-techniques.png)
 
 ## Known limitations
 
