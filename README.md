@@ -72,50 +72,11 @@ The timed playback (`utils/timeline.js`) and the network's breathing (`utils/fab
 
 Each part of the artwork is a class in its own file, and each mechanic lives in its own script. `sketch.js` creates the objects and calls them in order every frame. Files are loaded with `<script>` tags in `index.html`: shared utilities first, then the mechanics, then `sketch.js`.
 
-![Commuter Loom architecture: sketch.js reads the shared utilities, updates the three mechanics and the interface, and passes one frame object to the grains, where touch, sound and noise meet](docs/architecture.png)
+![Commuter Loom architecture: every class with its constructor, fields, methods and key local variables; sketch.js holds a global variable for each object, updates the utilities and mechanics every frame, and passes one frame object to the grains](docs/architecture.png)
 
-<sub>Diagram source: [`docs/architecture.html`](docs/architecture.html)</sub>
+![Commuter Loom project structure: the root page files, the three mechanics with the teammate who owns each, the shared utilities and the other folders, each with what it does](docs/project-structure.png)
 
-#### 🧵 Root
-
-| File | What it does |
-|---|---|
-| `index.html` | Loads p5.js, the utilities, the mechanics and `sketch.js`, in that order |
-| `style.css` | The page, the Raleway font and the HTML buttons in the control dock |
-| `sketch.js` | `preload()`, `setup()` and `draw()`: creates every object, builds the `frame` each frame and hands p5 events to `InputControls` |
-
-#### 🎛️ `mechanics/`: one file per team member
-
-| File | Class | Owner | What it does |
-|---|---|---|---|
-| `perlin-flow.js` | `LineStream`, `Grain`, `FabricPress` | Wanghao · Perlin noise and randomness | The grains: stitches and knots with their own random character, drifting with Perlin noise, thinned or thickened by the month's trips. `FabricPress` is the soft dent the hovering pointer makes. |
-| `input-controls.js` | `InputControls` | Promie · User input | Mouse, touch and keyboard: gather, pull and stir forces the grains ask for, listening mode, and travelling through time. |
-| `audio-reactive.js` | `AudioReactive` | Guangshun · Audio | The three city-sound layers mixed by the data, `p5.FFT` analysis, the mute button and the bass, mid and treble values the grains read. |
-
-#### 🧰 `utils/`: shared by every mechanic
-
-| File | Class | What it does |
-|---|---|---|
-| `trip-data.js` | `TripData` | Reads the CSV and answers data questions: trips per line and month, each line's normal month, the quiet COVID period. |
-| `network-layout.js` | *(data only)* | `STATIONS`, `LINE_ROUTES` and `LANE_ORDER`: the schematic station grid and each line's stopping pattern. |
-| `rail-network.js` | `RailNetwork` | Builds every line's tracks from the station grid, places shared lines side by side, draws station names and line badges, and finds the line under the mouse. |
-| `track-path.js` | `TrackPath` | One branch of one line as a smooth list of points: positions along it and its sideways direction. |
-| `timeline.js` | `Timeline` | The woven timeline: one thread per month, split into line colours. Also the playhead, hover preview, year jumps, scrubbing and timed playback. |
-| `fabric-breath.js` | `FabricBreath` | The network's breathing: a swell and release whose depth and speed come from the month's trips, deepened by the sound's loudness. |
-| `data-panel.js` | `DataPanel` | The month and trip count with a split-flap effect, a ten-year trace and a breath monitor. |
-| `interface-overlay.js` | `InterfaceOverlay` | Title, status messages, fades and the control dock along the bottom. |
-| `colour-theme.js` | `ColourTheme` | Every colour in one place, in a dark and a light palette, plus the sun/moon switch. |
-| `logo-mark.js` | `LogoMark` | Draws the woven-swatch logo at any size. |
-
-#### 📁 Everything else
-
-| Folder | What it holds |
-|---|---|
-| `data/` | The processed CSV the sketch reads, and the raw Transport for NSW sources |
-| `assets/` | The four city-sound files, the Raleway font and `logo.svg` |
-| `script/` | Python scripts for cleaning the data and generating the sounds |
-| `libraries/` | p5.js 1.10.0 and p5.sound |
-| `docs/` | The README preview and the architecture diagram (not deployed) |
+<sub>Diagram sources: [`docs/architecture.html`](docs/architecture.html) · [`docs/project-structure.html`](docs/project-structure.html)</sub>
 
 ### Every frame
 
