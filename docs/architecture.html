@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commuter Loom architecture</title>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper: #0e111a;
+      --color-ink:   #f2efe6;
+      --color-muted: #a3a9b8;
+    }
+    body {
+      font-family: 'Raleway', system-ui, sans-serif;
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1000px; width: 100%; }
+    .diagram-container { width: 100%; overflow-x: auto; }
+    svg { width: 100%; min-width: 1000px; display: block; }
+    @media print {
+      .diagram-container { overflow-x: visible; }
+      svg { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div class="diagram-container">
+      <svg id="architecture" viewBox="0 0 1000 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="architecture-title architecture-desc">
+        <title id="architecture-title">Commuter Loom code architecture</title>
+        <desc id="architecture-desc">sketch.js reads the shared utilities each frame, updates the three mechanics and the interface, and passes one frame object to the grains in perlin-flow.js, where touch, sound and noise meet.</desc>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#a3a9b8"/></marker>
+          <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#e8a75e"/></marker>
+          <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+            <circle cx="1" cy="1" r="0.9" fill="rgba(242,239,230,0.05)"/>
+          </pattern>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#0e111a"/>
+        <rect width="100%" height="100%" fill="url(#dots)"/>
+
+        <!-- The nine line colours, as a woven stitch along the top -->
+        <g stroke-width="3" stroke-linecap="round">
+          <line x1="40" y1="28" x2="56" y2="28" stroke="#F5A93F"/>
+          <line x1="62" y1="28" x2="78" y2="28" stroke="#25A9D1"/>
+          <line x1="84" y1="28" x2="100" y2="28" stroke="#EC7A37"/>
+          <line x1="106" y1="28" x2="122" y2="28" stroke="#3D86D6"/>
+          <line x1="128" y1="28" x2="144" y2="28" stroke="#DC3A9F"/>
+          <line x1="150" y1="28" x2="166" y2="28" stroke="#7E9EDB"/>
+          <line x1="172" y1="28" x2="188" y2="28" stroke="#A3AEB5"/>
+          <line x1="194" y1="28" x2="210" y2="28" stroke="#14B866"/>
+          <line x1="216" y1="28" x2="232" y2="28" stroke="#EE3D52"/>
+        </g>
+
+        <!-- Column eyebrows -->
+        <g font-family="'Geist Mono', ui-monospace, monospace" font-size="10" letter-spacing="1.6" fill="#8d93a1">
+          <text x="40" y="68">SHARED STATE · utils/</text>
+          <text x="296" y="68">CONDUCTOR</text>
+          <text x="536" y="68">MECHANICS · mechanics/</text>
+          <text x="800" y="68">WHERE THEY MEET</text>
+        </g>
+
+        <!-- ===== Arrows (drawn before boxes) ===== -->
+        <g fill="none" stroke="#a3a9b8" stroke-width="1.2">
+          <!-- utilities into sketch.js -->
+          <line x1="240" y1="116" x2="294" y2="116" marker-end="url(#arrow)"/>
+          <line x1="240" y1="212" x2="294" y2="212" marker-end="url(#arrow)"/>
+          <line x1="240" y1="308" x2="294" y2="308" marker-end="url(#arrow)"/>
+          <!-- sketch.js updates the mechanics and the interface -->
+          <line x1="480" y1="116" x2="534" y2="116" marker-end="url(#arrow)"/>
+          <line x1="480" y1="212" x2="534" y2="212" marker-end="url(#arrow)"/>
+          <line x1="480" y1="308" x2="534" y2="308" marker-end="url(#arrow)"/>
+          <!-- the hand and the sound reach the grains -->
+          <path d="M736,116 H878 Q886,116 886,124 V154" marker-end="url(#arrow)"/>
+          <line x1="736" y1="212" x2="798" y2="212" marker-end="url(#arrow)"/>
+        </g>
+        <!-- the frame object: the headline path -->
+        <path d="M388,344 V376 Q388,384 396,384 H878 Q886,384 886,376 V270" fill="none" stroke="#e8a75e" stroke-width="1.6" marker-end="url(#arrow-accent)"/>
+
+        <!-- Arrow labels -->
+        <g font-family="'Geist Mono', ui-monospace, monospace" font-size="10" letter-spacing="1.2" text-anchor="middle">
+          <rect x="788" y="92" width="44" height="16" fill="#0e111a"/>
+          <text x="810" y="104" fill="#a3a9b8">HAND</text>
+          <rect x="745" y="188" width="44" height="16" fill="#0e111a"/>
+          <text x="767" y="200" fill="#a3a9b8">SOUND</text>
+          <rect x="604" y="360" width="128" height="16" fill="#0e111a"/>
+          <text x="668" y="372" fill="#e8a75e">FRAME OBJECT</text>
+        </g>
+
+        <!-- ===== Nodes ===== -->
+        <g font-family="'Geist Mono', ui-monospace, monospace">
+          <!-- TripData -->
+          <rect x="40" y="80" width="200" height="72" rx="6" fill="#0e111a"/>
+          <rect x="40" y="80" width="200" height="72" rx="6" fill="#151925" stroke="rgba(242,239,230,0.18)"/>
+          <text x="56" y="110" font-family="Raleway, sans-serif" font-weight="600" font-size="15" fill="#f2efe6">TripData</text>
+          <text x="56" y="130" font-size="10" fill="#a3a9b8">ten years of monthly trips</text>
+
+          <!-- RailNetwork -->
+          <rect x="40" y="176" width="200" height="72" rx="6" fill="#0e111a"/>
+          <rect x="40" y="176" width="200" height="72" rx="6" fill="#151925" stroke="rgba(242,239,230,0.18)"/>
+          <text x="56" y="206" font-family="Raleway, sans-serif" font-weight="600" font-size="15" fill="#f2efe6">RailNetwork</text>
+          <text x="56" y="226" font-size="10" fill="#a3a9b8">+ TrackPath · the map</text>
+
+          <!-- Timeline -->
+          <rect x="40" y="272" width="200" height="72" rx="6" fill="#0e111a"/>
+          <rect x="40" y="272" width="200" height="72" rx="6" fill="#151925" stroke="rgba(242,239,230,0.18)"/>
+          <text x="56" y="302" font-family="Raleway, sans-serif" font-weight="600" font-size="15" fill="#f2efe6">Timeline</text>
+          <text x="56" y="322" font-size="10" fill="#a3a9b8">+ FabricBreath · time</text>
+
+          <!-- sketch.js -->
+          <rect x="296" y="80" width="184" height="264" rx="6" fill="#0e111a"/>
+          <rect x="296" y="80" width="184" height="264" rx="6" fill="#151925" stroke="#f2efe6" stroke-width="1.2"/>
+          <text x="312" y="112" font-family="Raleway, sans-serif" font-weight="700" font-size="17" fill="#f2efe6">sketch.js</text>
+          <text x="312" y="132" font-size="10" fill="#a3a9b8">preload · setup · draw</text>
+          <line x1="312" y1="152" x2="464" y2="152" stroke="rgba(242,239,230,0.14)"/>
+          <text x="312" y="176" font-size="10" fill="#8d93a1">EVERY FRAME</text>
+          <text x="312" y="204" font-size="11" fill="#f2efe6"><tspan fill="#e8a75e">1</tspan>  update the state</text>
+          <text x="312" y="228" font-size="11" fill="#f2efe6"><tspan fill="#e8a75e">2</tspan>  build the frame</text>
+          <text x="312" y="252" font-size="11" fill="#f2efe6"><tspan fill="#e8a75e">3</tspan>  draw grains + UI</text>
+          <line x1="312" y1="276" x2="464" y2="276" stroke="rgba(242,239,230,0.14)"/>
+          <text x="312" y="300" font-size="10" fill="#a3a9b8">p5 events go to</text>
+          <text x="312" y="316" font-size="10" fill="#a3a9b8">InputControls</text>
+
+          <!-- InputControls -->
+          <rect x="536" y="80" width="200" height="72" rx="6" fill="#0e111a"/>
+          <rect x="536" y="80" width="200" height="72" rx="6" fill="#151925" stroke="rgba(242,239,230,0.18)"/>
+          <text x="552" y="110" font-family="Raleway, sans-serif" font-weight="600" font-size="15" fill="#f2efe6">InputControls</text>
+          <text x="552" y="130" font-size="10" fill="#a3a9b8">user input · Promie</text>
+
+          <!-- AudioReactive -->
+          <rect x="536" y="176" width="200" height="72" rx="6" fill="#0e111a"/>
+          <rect x="536" y="176" width="200" height="72" rx="6" fill="#151925" stroke="rgba(242,239,230,0.18)"/>
+          <text x="552" y="206" font-family="Raleway, sans-serif" font-weight="600" font-size="15" fill="#f2efe6">AudioReactive</text>
+          <text x="552" y="226" font-size="10" fill="#a3a9b8">audio · Guangshun</text>
+
+          <!-- Interface -->
+          <rect x="536" y="272" width="200" height="72" rx="6" fill="#0e111a"/>
+          <rect x="536" y="272" width="200" height="72" rx="6" fill="none" stroke="rgba(242,239,230,0.18)" stroke-dasharray="4,3"/>
+          <text x="552" y="302" font-family="Raleway, sans-serif" font-weight="600" font-size="15" fill="#f2efe6">Interface</text>
+          <text x="552" y="322" font-size="10" fill="#a3a9b8">DataPanel · Overlay · Theme</text>
+
+          <!-- LineStream: the focal node -->
+          <rect x="800" y="156" width="172" height="112" rx="6" fill="#0e111a"/>
+          <rect x="800" y="156" width="172" height="112" rx="6" fill="rgba(232,167,94,0.10)" stroke="#e8a75e" stroke-width="1.4"/>
+          <text x="816" y="188" font-family="Raleway, sans-serif" font-weight="700" font-size="15" fill="#f2efe6">LineStream</text>
+          <text x="816" y="208" font-family="Raleway, sans-serif" font-weight="600" font-size="12" fill="#f2efe6">Grain · FabricPress</text>
+          <text x="816" y="230" font-size="10" fill="#e8a75e">Perlin noise · Wanghao</text>
+          <text x="816" y="250" font-size="10" fill="#a3a9b8">draws ~12k grains</text>
+        </g>
+
+        <!-- Footnote under the focal node -->
+        <text x="960" y="416" text-anchor="end" font-family="Raleway, sans-serif" font-style="italic" font-size="13" fill="#a3a9b8">Touch, sound and noise all move the same grains.</text>
+
+        <!-- ===== Legend strip ===== -->
+        <line x1="40" y1="436" x2="960" y2="436" stroke="rgba(242,239,230,0.14)"/>
+        <g font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#a3a9b8" letter-spacing="0.6">
+          <rect x="40" y="460" width="20" height="12" rx="2" fill="#151925" stroke="rgba(242,239,230,0.18)"/>
+          <text x="68" y="470">class</text>
+          <rect x="128" y="460" width="20" height="12" rx="2" fill="none" stroke="rgba(242,239,230,0.18)" stroke-dasharray="4,3"/>
+          <text x="156" y="470">group of classes</text>
+          <rect x="292" y="460" width="20" height="12" rx="2" fill="rgba(232,167,94,0.10)" stroke="#e8a75e"/>
+          <text x="320" y="470">where the mechanics meet</text>
+          <line x1="500" y1="466" x2="528" y2="466" stroke="#a3a9b8" stroke-width="1.2" marker-end="url(#arrow)"/>
+          <text x="536" y="470">read or updated each frame</text>
+          <line x1="732" y1="466" x2="760" y2="466" stroke="#e8a75e" stroke-width="1.6" marker-end="url(#arrow-accent)"/>
+          <text x="768" y="470">frame passed to the grains</text>
+        </g>
+        <text x="40" y="508" font-family="'Geist Mono', ui-monospace, monospace" font-size="10" fill="#8d93a1">The frame object carries the press, the hand, the month's pulse, the breath, the sound and the time.</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>

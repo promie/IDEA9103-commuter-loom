@@ -72,48 +72,50 @@ The timed playback (`utils/timeline.js`) and the network's breathing (`utils/fab
 
 Each part of the artwork is a class in its own file, and each mechanic lives in its own script. `sketch.js` creates the objects and calls them in order every frame. Files are loaded with `<script>` tags in `index.html`: shared utilities first, then the mechanics, then `sketch.js`.
 
-```text
-commuter-loom/
-├── index.html
-├── style.css
-├── sketch.js                    preload/setup/draw; creates the objects; p5 events
-├── utils/
-│   ├── colour-theme.js          class ColourTheme (dark and light palettes)
-│   ├── logo-mark.js             class LogoMark (the woven-swatch logo)
-│   ├── network-layout.js        STATIONS, LINE_ROUTES, LANE_ORDER (data only)
-│   ├── track-path.js            class TrackPath
-│   ├── rail-network.js          class RailNetwork
-│   ├── trip-data.js             class TripData
-│   ├── timeline.js              class Timeline
-│   ├── fabric-breath.js         class FabricBreath
-│   ├── data-panel.js            class DataPanel
-│   └── interface-overlay.js     class InterfaceOverlay
-├── mechanics/
-│   ├── perlin-flow.js           class Grain, class LineStream, class FabricPress  (Wanghao)
-│   ├── input-controls.js        class InputControls                               (Promie)
-│   └── audio-reactive.js        class AudioReactive                               (Guangshun)
-├── data/                        processed CSV and the raw Transport for NSW sources
-├── assets/                      the city-sound layers, Raleway font, logo.svg
-├── script/                      Python data cleaning and sound generation
-└── libraries/                   p5.js 1.10.0 and p5.sound
-```
+![Commuter Loom architecture: sketch.js reads the shared utilities, updates the three mechanics and the interface, and passes one frame object to the grains, where touch, sound and noise meet](docs/architecture.png)
 
-| Class | Responsibility |
+<sub>Diagram source: [`docs/architecture.html`](docs/architecture.html)</sub>
+
+#### 🧵 Root
+
+| File | What it does |
 |---|---|
-| `ColourTheme` | Every colour in one place, in a dark (night network, the default) and a light (warm paper) palette, plus the sun/moon switch. Switching theme recolours everything. |
-| `LogoMark` | Draws the woven-swatch logo at any size with `translate()` and `scale()`. |
-| `TripData` | Reads the CSV and answers data questions: trips per line and month, each line's normal month, the quiet COVID period. |
-| `RailNetwork` | Builds every line's tracks from the station grid, places shared lines side by side, draws station names and line badges, and finds the line under the mouse. |
-| `TrackPath` | One branch of one line as a smooth list of points: positions along it and its sideways direction. |
-| `LineStream` | All the grains of one line, plus the line's eased look for the month (visible share, speed, width, brightness) and its reaction to listening mode, the pulse, the breath and the sound. |
-| `Grain` | One stitch or knot: moves along its track, drifts with Perlin noise, is moved by the hand and springs back. |
-| `FabricPress` | The soft dent the hovering pointer makes in the threads. |
-| `InputControls` | Mouse, touch and keyboard behaviour, and the gather, pull and stir forces the grains ask for. |
-| `AudioReactive` | The three sound layers, the data-driven mix, the FFT analysis, the mute button and the band values the grains read. |
-| `Timeline` | The woven timeline: one thread per month, its height set by network trips and split into line colours. Also the playhead, hover preview, year jumps, scrubbing, and timed playback that starts on load and loops. |
-| `DataPanel` | The month and trip count with a split-flap effect, a ten-year trace and a breath monitor. Shows the selected line in listening mode. |
-| `FabricBreath` | The network's breathing: a timer-driven swell and release whose depth and speed come from that month's network trips, deepened by the sound's loudness. |
-| `InterfaceOverlay` | Title, status messages, fades and the control dock along the bottom that holds the buttons and the timeline. |
+| `index.html` | Loads p5.js, the utilities, the mechanics and `sketch.js`, in that order |
+| `style.css` | The page, the Raleway font and the HTML buttons in the control dock |
+| `sketch.js` | `preload()`, `setup()` and `draw()`: creates every object, builds the `frame` each frame and hands p5 events to `InputControls` |
+
+#### 🎛️ `mechanics/`: one file per team member
+
+| File | Class | Owner | What it does |
+|---|---|---|---|
+| `perlin-flow.js` | `LineStream`, `Grain`, `FabricPress` | Wanghao · Perlin noise and randomness | The grains: stitches and knots with their own random character, drifting with Perlin noise, thinned or thickened by the month's trips. `FabricPress` is the soft dent the hovering pointer makes. |
+| `input-controls.js` | `InputControls` | Promie · User input | Mouse, touch and keyboard: gather, pull and stir forces the grains ask for, listening mode, and travelling through time. |
+| `audio-reactive.js` | `AudioReactive` | Guangshun · Audio | The three city-sound layers mixed by the data, `p5.FFT` analysis, the mute button and the bass, mid and treble values the grains read. |
+
+#### 🧰 `utils/`: shared by every mechanic
+
+| File | Class | What it does |
+|---|---|---|
+| `trip-data.js` | `TripData` | Reads the CSV and answers data questions: trips per line and month, each line's normal month, the quiet COVID period. |
+| `network-layout.js` | *(data only)* | `STATIONS`, `LINE_ROUTES` and `LANE_ORDER`: the schematic station grid and each line's stopping pattern. |
+| `rail-network.js` | `RailNetwork` | Builds every line's tracks from the station grid, places shared lines side by side, draws station names and line badges, and finds the line under the mouse. |
+| `track-path.js` | `TrackPath` | One branch of one line as a smooth list of points: positions along it and its sideways direction. |
+| `timeline.js` | `Timeline` | The woven timeline: one thread per month, split into line colours. Also the playhead, hover preview, year jumps, scrubbing and timed playback. |
+| `fabric-breath.js` | `FabricBreath` | The network's breathing: a swell and release whose depth and speed come from the month's trips, deepened by the sound's loudness. |
+| `data-panel.js` | `DataPanel` | The month and trip count with a split-flap effect, a ten-year trace and a breath monitor. |
+| `interface-overlay.js` | `InterfaceOverlay` | Title, status messages, fades and the control dock along the bottom. |
+| `colour-theme.js` | `ColourTheme` | Every colour in one place, in a dark and a light palette, plus the sun/moon switch. |
+| `logo-mark.js` | `LogoMark` | Draws the woven-swatch logo at any size. |
+
+#### 📁 Everything else
+
+| Folder | What it holds |
+|---|---|
+| `data/` | The processed CSV the sketch reads, and the raw Transport for NSW sources |
+| `assets/` | The four city-sound files, the Raleway font and `logo.svg` |
+| `script/` | Python scripts for cleaning the data and generating the sounds |
+| `libraries/` | p5.js 1.10.0 and p5.sound |
+| `docs/` | The README preview and the architecture diagram (not deployed) |
 
 ### Every frame
 
@@ -181,14 +183,3 @@ All three of us used Claude (Anthropic) while building this project. Every file 
 - **Station busyness is a placeholder.** The station `tier` values in `utils/network-layout.js` are a rough ranking. They should be replaced with the Transport for NSW *Train Station Entries and Exits* dataset.
 - **Positions are schematic.** Stopping patterns follow the current routes, but stations are hand-placed. T2 Leppington runs via Harris Park and T3 Bankstown via Regents Park for simplicity.
 - The trip data uses historical line families, while the map shows today's routes (for example, T9 has no trips before it was introduced).
-
-## Development
-
-```bash
-npm run dev          # local server with live reload
-npm run check        # syntax-check every JavaScript file with node --check
-npm run clean-data   # rebuild data/monthly_line_trips_full.csv from data/train.csv
-npm run deploy       # check, upload to S3 (no-cache, so browsers always fetch the latest files), then clear the CloudFront cache
-```
-
-The site is live at <https://commuter-loom.pyutasane.com>. It is served from the private `commuter-loom-idea9103` S3 bucket through CloudFront (distribution `E2RD08R457901D`), with an ACM certificate and Route 53 alias records on `pyutasane.com`. The deploy leaves out the repo's own files (`README.md`, `package.json`, `script/`) and the raw data, so only what the page needs is published.
