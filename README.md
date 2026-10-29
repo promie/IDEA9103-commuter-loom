@@ -172,5 +172,9 @@ All three of us used Claude (Anthropic) while building this project. Every file 
 ## Development
 
 ```bash
-npm run check    # syntax-check every JavaScript file with node --check
+npm run check        # syntax-check every JavaScript file with node --check
+npm run clean-data   # rebuild data/monthly_line_trips_full.csv from data/train.csv
+npm run deploy       # check, upload to S3 (no-cache, so browsers always fetch the latest files), then clear the CloudFront cache
 ```
+
+The site is live at <https://commuter-loom.pyutasane.com>. It is served from the private `commuter-loom-idea9103` S3 bucket through CloudFront (distribution `E2RD08R457901D`), with an ACM certificate and Route 53 alias records on `pyutasane.com`. The deploy leaves out the repo's own files (`README.md`, `package.json`, `script/`) and the raw data, so only what the page needs is published.

@@ -4,6 +4,8 @@
   "version": "1.0.0",
   "description": "Commuter Loom: Collective Movement Memory, a data-driven p5.js artwork (IDEA9103)",
   "scripts": {
-    "check": "for f in sketch.js utils/*.js mechanics/*.js; do node --check \"$f\" || exit 1; done"
+    "check": "for f in sketch.js utils/*.js mechanics/*.js; do node --check \"$f\" || exit 1; done",
+    "clean-data": "python3 script/clean_data.py",
+    "deploy": "npm run check && aws s3 sync . s3://commuter-loom-idea9103 --delete --exclude '.git/*' --exclude '.gitignore' --exclude '.claude/*' --exclude '.DS_Store' --exclude '*/.DS_Store' --exclude 'package.json' --exclude 'package-lock.json' --exclude 'node_modules/*' --exclude 'README.md' --exclude 'script/*' --exclude 'data/train.csv' --exclude 'data/sydneytrains.geojson' --exclude 'docs/*' --cache-control no-cache --profile default --region ap-southeast-2 && aws cloudfront create-invalidation --distribution-id E2RD08R457901D --paths '/*' --profile default"
   }
 }
