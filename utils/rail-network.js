@@ -237,7 +237,6 @@ class RailNetwork {
       path.findLoopLength(centralX, centralY, 6 * this.gridUnit);
     }
 
-    path.measureCrowding(this.getBusyStations(stopIds), this.gridUnit);
     return path;
   }
 
@@ -256,19 +255,6 @@ class RailNetwork {
     }
     smoothed.push(points[points.length - 1]);
     return smoothed;
-  }
-
-  // The named stations on one branch, with their screen position and how
-  // busy they are (tier 3 = 1, tier 1 = 0.33).
-  getBusyStations(stopIds) {
-    let busyStations = [];
-    for (let stopId of stopIds) {
-      let station = this.getStation(stopId);
-      if (station.tier > 0) {
-        busyStations.push({ x: this.toScreenX(station), y: this.toScreenY(station), strength: station.tier / 3 });
-      }
-    }
-    return busyStations;
   }
 
   // Remembers a point every 10 pixels along the path, for mouse hit tests.

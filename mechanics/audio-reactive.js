@@ -113,7 +113,8 @@ class AudioReactive {
     this.button = createButton("");
     this.button.id("audio-control");
     this.button.addClass("commuter-control");
-    // Sound is on by default (it starts playing when play is pressed).
+    // Sound is on by default. start() runs in setup(), and the browser lets
+    // it play from the visitor's first click, tap or key press.
     this.showButton(SOUND_ON_ICON, "Mute sound");
   }
 
@@ -133,7 +134,7 @@ class AudioReactive {
     // userStartAudio() unlocks the browser's sound on the visitor's first
     // click, tap or key press anywhere on the page.
     userStartAudio();
-    // Respect a mute chosen before play was pressed.
+    // Respect a mute chosen before the sound started.
     if (this.isMuted) {
       outputVolume(0);
     } else {

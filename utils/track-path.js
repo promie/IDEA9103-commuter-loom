@@ -2,17 +2,11 @@
 // A TrackPath is one branch of one train line (for example "T1 to Emu
 // Plains"), stored as a list of screen points that the particles travel
 // along. It can answer "where am I if I have travelled this many pixels
-// along the track?" and "how crowded is the track here?".
+// along the track?".
 //
 // AI acknowledgement: this class was written with the help of Claude
 // (Anthropic). It walks along a list of points and measures distances with
-// p5's dist(), lerp() and exp().
-
-// How often (in pixels along the track) we pre-calculate crowding.
-const CROWDING_SAMPLE_SPACING = 4;
-
-// How far a busy station's crowding reaches along the track, in grid units.
-const CROWDING_REACH_UNITS = 1.1;
+// p5's dist() and lerp().
 
 class TrackPath {
   constructor(lineName, branchIndex, points, particleShare) {
@@ -36,10 +30,6 @@ class TrackPath {
     // For City Circle routes: how far along the track the train is back at
     // Central after going round the loop. Stays 0 for every other route.
     this.loopLength = 0;
-
-    // crowding[k] is how crowded the track is at k * CROWDING_SAMPLE_SPACING
-    // pixels along it, from 0 (open track) to 1 (Central).
-    this.crowding = [];
   }
 
   // Finds which pair of points a distance falls between. Particles move a
@@ -77,40 +67,6 @@ class TrackPath {
     // turned 90 degrees). Particles are spread across the band along it.
     position.normalX = -(end.y - start.y) / segmentLength;
     position.normalY = (end.x - start.x) / segmentLength;
-  }
-
-  // Works out the crowding along the whole track once, so the particles can
-  // look it up cheaply every frame. Each busy station on this branch makes
-  // the track around it more crowded, fading away with distance.
-  measureCrowding(busyStations, gridUnit) {
-    let reach = CROWDING_REACH_UNITS * gridUnit;
-    let position = {};
-    this.crowding = [];
-
-    let sampleCount = ceil(this.totalLength / CROWDING_SAMPLE_SPACING) + 1;
-    let segmentIndex = 0;
-    for (let k = 0; k < sampleCount; k++) {
-      let distance = k * CROWDING_SAMPLE_SPACING;
-      segmentIndex = this.findSegmentIndex(distance, segmentIndex);
-      this.getPositionAt(distance, segmentIndex, position);
-
-      let crowdingHere = 0;
-      for (let station of busyStations) {
-        let distanceToStation = dist(position.x, position.y, station.x, station.y);
-        // A bell-shaped falloff: full strength at the station, fading out
-        // over roughly "reach" pixels either side.
-        let falloff = exp(-(distanceToStation * distanceToStation) / (2 * reach * reach));
-        let strength = station.strength * station.strength * falloff;
-        crowdingHere = max(crowdingHere, strength);
-      }
-      this.crowding.push(crowdingHere);
-    }
-  }
-
-  getCrowdingAt(distance) {
-    let index = round(distance / CROWDING_SAMPLE_SPACING);
-    index = constrain(index, 0, this.crowding.length - 1);
-    return this.crowding[index];
   }
 
   // For routes that start by circling the CBD: find how far along the track

@@ -16,9 +16,8 @@
 // Central is 0, 0), a display name and a "tier".
 // tier 3 = major CBD hub, 2 = big interchange, 1 = named station,
 // 0 = unnamed stop or a bend in the track.
-// Tiers are a provisional stand-in for foot traffic (busier stations get
-// more crowded particles). They should be replaced with the Transport for
-// NSW "Train Station Entries and Exits" dataset in the final version.
+// Tiers decide which stations are named on the map, in what order, and
+// how big and bold their dots and labels are.
 const STATIONS = [
   // CBD and the City Circle
   { id: "CEN", name: "Central", x: 0, y: 0, tier: 3 },

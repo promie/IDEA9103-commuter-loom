@@ -135,7 +135,7 @@ A few techniques serve the whole artwork rather than one mechanic.
 
 ## Known limitations
 
-- **Station busyness is a placeholder.** The station `tier` values in `utils/network-layout.js` are a rough ranking. They should be replaced with the Transport for NSW *Train Station Entries and Exits* dataset.
+- **Stations are ranked by hand.** The trip data is per line, not per station, so the station `tier` values in `utils/network-layout.js` are our own ranking. They only decide which stations are named and how prominent their dots and labels are. The Transport for NSW *Train Station Entries and Exits* dataset could rank them from real foot traffic instead.
 - **Positions are schematic.** Stopping patterns follow the current routes, but stations are hand-placed. T2 Leppington runs via Harris Park and T3 Bankstown via Regents Park for simplicity.
 - The trip data uses historical line families, while the map shows today's routes (for example, T9 has no trips before it was introduced).
 

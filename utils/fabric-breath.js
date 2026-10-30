@@ -6,10 +6,11 @@
 // When the audio is playing, its loudness deepens the breath further, so
 // sound and data move the fabric together.
 //
-// This idea was suggested by our tutor, inspired by Jon Reades' "Pulse of
-// the City", which shows London's daily rhythm in Oyster card data. We
-// reinterpreted it as a textile breathing over ten years, rather than a
-// city's heartbeat over one week.
+// This idea was suggested by our tutor, inspired by Jon Reades' "A Week in
+// the Life of London Underground" (UCL CASA, 2012), which shows "the pulse
+// of the city" in a week of Oyster card taps. We reinterpreted it as a
+// textile breathing over ten years, rather than a city's heartbeat over
+// one week.
 //
 // AI acknowledgement: this class was written with the help of Claude
 // (Anthropic).
